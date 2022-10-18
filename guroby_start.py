@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-
-from gurobipy import *
+import sys
+import gurobipy as gp
+from gurobipy import GRB
+import pandas as pd
 
 
 def addBinaryCut(j):
@@ -8,15 +10,33 @@ def addBinaryCut(j):
 	for i in range(n):
 		B.append(i) if (x[i].x == 1) else NB.append(i)
 	# Add binary cut to Model
-	m.addConstr((quicksum(x[i] for i in B) - quicksum(x[j] for j in NB)) <= len(B) - 1, name="binaryCut{}".format(j))
+	m.addConstr((gp.quicksum(x[i] for i in B) - gp.quicksum(x[j] for j in NB)) <= len(B) - 1, name="binaryCut{}".format(j))
 	m.update()
 
+def availability_constraint(model, i):
+    
+    return sum(model.x[i, k] for k in model.K) <= model.b[i]
+
+def weight_constraint(model, k):
+    
+    return sum(model.x[i, k] * model.w[i] for i in model.I) <= model.kw[k]
+
+def volume_constraint(model, k):
+    
+    return sum(model.x[i, k] * model.v[i] for i in model.I) <= model.kv[k]
+
+def obj_function(model):
+    
+    return - sum(model.x[i, k] * model.c[i]\
+        for i in model.I for k in model.K)
 
 # define data coefficients
 n = 9
-p = [6, 6, 8, 9, 6, 7, 3, 2, 6]
-w = [2, 3, 6, 7, 5, 9, 4, 8, 5]
-c = 20
+p = [1, 6, 8, 9, 12, 25, 3, 12, 6]
+w = [1, 3, 6, 7, 5, 9, 4, 8, 5]
+c = 1
+
+
 
 # Maximize
 #   6 x[0] + 6 x[1] + 8 x[2] + 9 x[3] + 6 x[4] + 7 x[5] + 3 x[6] + 2 x[7] + 6 x[8]
@@ -25,16 +45,16 @@ c = 20
 
 
 # create empty model
-m = Model()
+m = gp.Model()
 
 # add decision variables
 x = m.addVars(n, vtype=GRB.BINARY, name='x')
 
 # set objective function
-m.setObjective(quicksum(p[i] * x[i] for i in range(n)), GRB.MAXIMIZE)
+m.setObjective(gp.quicksum(p[i] * x[i] for i in range(n)), GRB.MAXIMIZE)
 
 # add constraint
-m.addConstr((quicksum(w[i] * x[i] for i in range(n)) <= c), name="knapsack")
+m.addConstr((gp.quicksum(w[i] * x[i] for i in range(n)) <= c), name="knapsack")
 
 # Add Lazy Constraints
 m.update()
