@@ -1,34 +1,72 @@
-from gurobipy import *
+#!/usr/bin/env python3
+import sys
+import gurobipy as gp
+from gurobipy import GRB
+import pandas as pd
 
-def example():
-    J,v = multidict({1:16, 2:19, 3:23, 4:28})
-    a = {(1,1):2, (1,2):3, (1,3):4, (1,4):5,
-        (2,1):3000, (2,2):3500, (2,3):5100, (2,4):7200
-    }
-    I,b = multidict({1:7, 2:10000})
-    return I,J,v,a,b
 
-def mkp(I,J,v,a,b):
-    model = Model("mkp")
-    x = {}
-    for j in J:
-        x[j] = model.addVar(vtype = "B", name = "x(%d)"%j)
-        model.update()
-    for i in I:
-        model.addConstr(quicksum(a[i,j]*x[j] for j in J) <= b[i])
-    model.setObjective(quicksum(v[j]*x[j] for j in J), GRB.MAXIMIZE)
-    model.update()
-    return model
+def addBinaryCut(j,m):
+	x=m.getVars()
+	n=len(x)
+	B, NB = [], []
+	for i in range(n):
+		B.append(i) if (x[i].x == 1) else NB.append(i)
+	# Add binary cut to Model
+	m.addConstr((gp.quicksum(x[i] for i in B) - gp.quicksum(x[j] for j in NB)) <= len(B) - 1, name="binaryCut{}".format(j))
+	m.update()
+	print("addBinary executed")
 
-if __name__ == "__main__" :
-    I, J, v, a, b = example()
-    model = mkp(I, J, v, a, b)
-    model.update()
-    model.write("mkp.lp")
-    model.optimize()
 
-    print("Optimum value =", model.ObjVal)
-    EPS = 1.e-6
-    for v in model.getVars():
-        if v.X > EPS :
-            print(v.VarName, v.X)
+def CreateModel(n,p,w,v,wc,vc):
+   # create empty model
+   m = gp.Model()
+   # add decision variables
+   x = m.addVars(n, vtype=GRB.BINARY, name='x')
+   # set objective function
+   m.setObjective(gp.quicksum(p[i] * x[i] for i in range(n)), GRB.MAXIMIZE)
+   # add constraint
+   m.addConstr((gp.quicksum(w[i] * x[i] for i in range(n)) <= wc), name="knapsack-w")
+   m.addConstr((gp.quicksum(v[i] * x[i] for i in range(n)) <= vc), name="knapsack-v")
+   # Add Lazy Constraints
+   m.update()
+   # quiet gurobi
+   m.setParam(GRB.Param.LogToConsole, 0)
+   print("create model executed")
+   return m
+
+
+def SolveModel(m) : 
+	searchBool = True
+	k = 1
+	while searchBool:
+		# solve the model
+		m.optimize()
+		if m.Status == GRB.OPTIMAL:
+			if k == 1:
+				zopt = m.ObjVal
+			znew = m.ObjVal if (k > 1) else zopt
+			if znew == zopt:
+				# Found new feasible optimal solution
+				m.write("{}.sol".format(k))
+				# Make the previous solution infeasible
+				addBinaryCut(k,m)
+				k += 1
+			else:
+				searchBool = False
+	print("Found {} optimal feasible Solutions!".format(k-1))
+	m.write("knapsack.lp")
+
+def main(): 
+	# define data coefficients
+	n = 9  #number of items
+	p = [1, 6, 8, 9, 6, 7, 3, 2, 6]  #profits
+	w = [1, 3, 6, 7, 5, 9, 4, 8, 5]  #weights
+	v = [1, 3, 2, 9, 1, 4, 2, 4, 7]  #volumes
+	wc = 1  #capacity (weight)
+	vc = 1  #capacity (volume)
+	m=CreateModel(n,p,w,v,wc,vc)
+	SolveModel(m)
+	  
+
+if __name__ == '__main__':
+   main()
