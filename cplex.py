@@ -78,7 +78,7 @@ def MKPpopulate(name: str) -> Tuple:
 
 def main() :
  # Call the function on a given instance
- instance = r'C:\Users\salva\OneDrive\Desktop\Università\SECONDO ANNO\secondo trimestre\Multidimensional_Knapsack_Problem_Modelling\mknap01_7.txt'
+ instance = 'istances/mknap01_7.txt'
  c, A, b = MKPpopulate(instance)
  # Define the ranges for variables and constraints
  nCols, nRows = range(len(c)), range(len(b))
