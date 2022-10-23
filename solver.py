@@ -13,14 +13,13 @@ def solveCplex(instance) :
  c, A, b = MKPpopulate(instance)
  # Define the ranges for variables and constraints
  nCols, nRows = range(len(c)), range(len(b))
- # Create an empty model
- mkp = Model('Mkp')
+ # Get name
  txtname = instance.split("/")[1]
  name = txtname.split(".txt")[0]
  cplexlog = name+".log"
+ # Create an empty model
+ mkp = Model(name)
  mkp.set_log_output("solutions/"+cplexlog)
- 
-
  # Define decision variables
  x = mkp.binary_var_list(nCols, lb = 0, ub = 1, name = 'x')
  constraints = mkp.add_constraints(sum(A[i][j] * x[j] for j in nCols) <= b[i] for i in nRows)

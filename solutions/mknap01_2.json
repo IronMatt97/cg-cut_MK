@@ -2,7 +2,7 @@
     "CPLEXSolution": {
         "header": {
             "objectiveValue": "8706.1",
-            "problemName": "Mkp",
+            "problemName": "mknap01_2",
             "solved_by": "cplex_local"
         },
         "linearConstraints": [

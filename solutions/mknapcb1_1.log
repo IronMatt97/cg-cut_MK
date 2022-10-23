@@ -89,6 +89,6 @@ Gomory fractional cuts applied:  4
 Root node processing (before b&c):
   Real time             =    0.00 sec. (1.76 ticks)
 Sequential b&c:
-  Real time             =    1.67 sec. (1161.66 ticks)
+  Real time             =    1.70 sec. (1161.66 ticks)
                           ------------
-Total (root+branch&cut) =    1.67 sec. (1163.42 ticks)
+Total (root+branch&cut) =    1.70 sec. (1163.42 ticks)

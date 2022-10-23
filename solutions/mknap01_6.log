@@ -20,7 +20,7 @@ Tried aggregator 1 time.
 Detecting symmetries...
 Reduced MIP has 5 rows, 39 columns, and 171 nonzeros.
 Reduced MIP has 39 binaries, 0 generals, 0 SOSs, and 0 indicators.
-Presolve time = 0.00 sec. (0.10 ticks)
+Presolve time = 0.02 sec. (0.10 ticks)
 Probing time = 0.00 sec. (0.01 ticks)
 MIP emphasis: balance optimality and feasibility.
 MIP search method: dynamic search.
@@ -34,14 +34,14 @@ Root relaxation solution time = 0.00 sec. (0.05 ticks)
       0     0    10658.6606     5                    Fract: 1       12         
 Detecting symmetries...
       0     2    10658.6606     5                  10658.1501       12         
-Elapsed time = 0.00 sec. (0.46 ticks, tree = 0.01 MB, solutions = 0)
+Elapsed time = 0.02 sec. (0.46 ticks, tree = 0.01 MB, solutions = 0)
 *    18     7      integral     0    10618.0000    10647.2685       68    0.28%
 
 Gomory fractional cuts applied:  1
 
 Root node processing (before b&c):
-  Real time             =    0.00 sec. (0.46 ticks)
+  Real time             =    0.02 sec. (0.46 ticks)
 Sequential b&c:
   Real time             =    0.00 sec. (0.32 ticks)
                           ------------
-Total (root+branch&cut) =    0.00 sec. (0.78 ticks)
+Total (root+branch&cut) =    0.02 sec. (0.78 ticks)
