@@ -64,6 +64,7 @@ def MKPpopulate(name: str) -> Tuple:
     assert len(b) == NumRows
     assert type(b) == np.ndarray
     
+
     return (c, A, b)
 
 def get_cut_stats(mdl):
