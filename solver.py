@@ -18,13 +18,14 @@ def solveCplex(instance) :
  profit = mkp.sum(c[j] * x[j] for j in nCols)
  mkp.add_kpi(profit, 'profit')
  objective = mkp.maximize(profit)
- 
+ # Tweak some CPLEX parameters so that CPLEX has a harder time to
+ # solve the model and our cut separators can actually kick in.
  params = mkp.parameters
  params.threads = 1
  params.mip.strategy.heuristicfreq = -1
  params.mip.cuts.mircut = -1
  params.mip.cuts.implied = -1
- #params.mip.cuts.gomory = -1
+ #params.mip.cuts.gomory = -1  ##ONLY GOMORY CUTS 
  params.mip.cuts.flowcovers = -1
  params.mip.cuts.pathcut = -1
  params.mip.cuts.liftproj = -1
