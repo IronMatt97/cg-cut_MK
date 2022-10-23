@@ -1,17 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Oct 21 18:09:09 2022
-
-@author: salva
-"""
-
-#!/usr/bin/env python
-# coding: utf-8
-
-import cplex
+import mkp_cplex
 from docplex.mp.model import Model
 from typing import Tuple
 import numpy as np
+import os
 
 def MKPpopulate(name: str) -> Tuple:
     # populateMKP
@@ -78,6 +69,7 @@ def MKPpopulate(name: str) -> Tuple:
 
 def main() :
  # Call the function on a given instance
+ print('PYTHONPATH="%s"\n' % os.environ['PYTHONPATH'])
  instance = 'istances/mknap01_7.txt'
  c, A, b = MKPpopulate(instance)
  # Define the ranges for variables and constraints
