@@ -1,0 +1,184 @@
+{
+    "CPLEXSolution": {
+        "header": {
+            "objectiveValue": "24381.0",
+            "problemName": "Mkp",
+            "solved_by": "cplex_local"
+        },
+        "linearConstraints": [
+            {
+                "index": 0,
+                "name": null,
+                "slack": 105.0
+            },
+            {
+                "index": 1,
+                "name": null,
+                "slack": 13.0
+            },
+            {
+                "index": 2,
+                "name": null,
+                "slack": 175.0
+            },
+            {
+                "index": 3,
+                "name": null,
+                "slack": 125.0
+            },
+            {
+                "index": 4,
+                "name": null,
+                "slack": 48.0
+            }
+        ],
+        "variables": [
+            {
+                "index": "1",
+                "name": "x_1",
+                "value": "1.0"
+            },
+            {
+                "index": "3",
+                "name": "x_3",
+                "value": "1.0"
+            },
+            {
+                "index": "6",
+                "name": "x_6",
+                "value": "1.0"
+            },
+            {
+                "index": "8",
+                "name": "x_8",
+                "value": "1.0"
+            },
+            {
+                "index": "10",
+                "name": "x_10",
+                "value": "1.0"
+            },
+            {
+                "index": "18",
+                "name": "x_18",
+                "value": "1.0"
+            },
+            {
+                "index": "23",
+                "name": "x_23",
+                "value": "1.0"
+            },
+            {
+                "index": "25",
+                "name": "x_25",
+                "value": "1.0"
+            },
+            {
+                "index": "26",
+                "name": "x_26",
+                "value": "1.0"
+            },
+            {
+                "index": "28",
+                "name": "x_28",
+                "value": "1.0"
+            },
+            {
+                "index": "29",
+                "name": "x_29",
+                "value": "1.0"
+            },
+            {
+                "index": "31",
+                "name": "x_31",
+                "value": "1.0"
+            },
+            {
+                "index": "43",
+                "name": "x_43",
+                "value": "1.0"
+            },
+            {
+                "index": "49",
+                "name": "x_49",
+                "value": "1.0"
+            },
+            {
+                "index": "56",
+                "name": "x_56",
+                "value": "1.0"
+            },
+            {
+                "index": "61",
+                "name": "x_61",
+                "value": "1.0"
+            },
+            {
+                "index": "62",
+                "name": "x_62",
+                "value": "1.0"
+            },
+            {
+                "index": "65",
+                "name": "x_65",
+                "value": "1.0"
+            },
+            {
+                "index": "68",
+                "name": "x_68",
+                "value": "1.0"
+            },
+            {
+                "index": "70",
+                "name": "x_70",
+                "value": "1.0"
+            },
+            {
+                "index": "73",
+                "name": "x_73",
+                "value": "1.0"
+            },
+            {
+                "index": "76",
+                "name": "x_76",
+                "value": "1.0"
+            },
+            {
+                "index": "78",
+                "name": "x_78",
+                "value": "1.0"
+            },
+            {
+                "index": "84",
+                "name": "x_84",
+                "value": "1.0"
+            },
+            {
+                "index": "85",
+                "name": "x_85",
+                "value": "1.0"
+            },
+            {
+                "index": "91",
+                "name": "x_91",
+                "value": "1.0"
+            },
+            {
+                "index": "92",
+                "name": "x_92",
+                "value": "1.0"
+            },
+            {
+                "index": "95",
+                "name": "x_95",
+                "value": "1.0"
+            },
+            {
+                "index": "98",
+                "name": "x_98",
+                "value": "1.0"
+            }
+        ],
+        "version": "1.0"
+    }
+}

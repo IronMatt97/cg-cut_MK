@@ -1,7 +1,10 @@
+from matplotlib.cbook import report_memory
 import solver
 from docplex.mp.model import Model
 from utils import MKPpopulate,  get_cut_stats
+import os
 import sys
+import json
 
 
 
@@ -12,6 +15,12 @@ def solveCplex(instance) :
  nCols, nRows = range(len(c)), range(len(b))
  # Create an empty model
  mkp = Model('Mkp')
+ txtname = instance.split("/")[1]
+ name = txtname.split(".txt")[0]
+ cplexlog = name+".log"
+ mkp.set_log_output("solutions/"+cplexlog)
+ 
+
  # Define decision variables
  x = mkp.binary_var_list(nCols, lb = 0, ub = 1, name = 'x')
  constraints = mkp.add_constraints(sum(A[i][j] * x[j] for j in nCols) <= b[i] for i in nRows)
@@ -39,14 +48,20 @@ def solveCplex(instance) :
  print(f"-- cuts stats ", cuts)
  print(f"-- total #cuts = {sum(nk for _, nk in cuts.items())}")
  mkp.report()
- with open("solutions/sol_"+instance.split("/")[1], "w") as solfile:
-    solfile.write(mkp.solution.to_string())
+ json_string= mkp.solution.export_as_json_string()
+ file_path_json="solutions/"+name+".json"
+ with open(file_path_json, "w") as output_file:
+    json_ = json.dumps(json.loads(json_string), indent=4, sort_keys=True)
+    output_file.write(json_)
+
 
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        solveCplex("istances/mknapcb1_1.txt")
+        for f in os.listdir("istances/") :
+            print("solving "+f)
+            solveCplex("istances/"+f)
     elif len(sys.argv) == 2:
         solveCplex(sys.argv[1])
     else:
