@@ -1,8 +1,8 @@
-import mkp_cplex
+import solver
 from docplex.mp.model import Model
 from typing import Tuple
 import numpy as np
-import os
+import sys
 
 def MKPpopulate(name: str) -> Tuple:
     # populateMKP
@@ -67,10 +67,8 @@ def MKPpopulate(name: str) -> Tuple:
 
 
 
-def main() :
+def solveCplex(instance) :
  # Call the function on a given instance
- print('PYTHONPATH="%s"\n' % os.environ['PYTHONPATH'])
- instance = 'istances/mknap01_7.txt'
  c, A, b = MKPpopulate(instance)
  # Define the ranges for variables and constraints
  nCols, nRows = range(len(c)), range(len(b))
@@ -88,5 +86,10 @@ def main() :
 
 
 if __name__ == '__main__':
-   main()
+    if len(sys.argv) == 1:
+        solveCplex("istances/mknap01_7.txt")
+    elif len(sys.argv) == 2:
+        solveCplex(sys.argv[1])
+    else:
+        print("type  ::::python solver.py TESTNAME.txt::::")
 
