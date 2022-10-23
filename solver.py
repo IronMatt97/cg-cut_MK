@@ -91,7 +91,7 @@ def solveCplex(instance) :
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        solveCplex("istances/mknap01_7.txt")
+        solveCplex("istances/mknapcb1_1.txt")
     elif len(sys.argv) == 2:
         solveCplex(sys.argv[1])
     else:

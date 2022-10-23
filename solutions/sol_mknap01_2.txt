@@ -1,0 +1,7 @@
+solution for: Mkp
+objective: 8706.1
+x_1=1
+x_3=1
+x_4=1
+x_7=1
+x_9=1
