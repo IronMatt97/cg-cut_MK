@@ -21,6 +21,8 @@ https://www.ibm.com/support/knowledgecenter/SSSA5P_12.8.0/ilog.odms.cplex.help/C
 ## Running
 ```python solver.py [test_name]```
 
+- It will generate a file called test_name_sol.txt in the solutions directory.
+
 
 
 

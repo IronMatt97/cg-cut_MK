@@ -83,6 +83,10 @@ def solveCplex(instance) :
  mkp.solve()
  # Reporting results
  mkp.report()
+ with open("solutions/sol_"+instance.split("/")[1], "w") as solfile:
+    solfile.write(mkp.solution.to_string())
+
+
 
 
 if __name__ == '__main__':
