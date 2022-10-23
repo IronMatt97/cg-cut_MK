@@ -1,4 +1,4 @@
-# Multidimensional knapsack problem using Linear Programing and Gomory Cuts
+# Multidimensional knapsack problem using Gomory Cuts' algorithm
 ### A simple CPLEX python code for solving the Multidimensional knapsack problem
 the problem is described below:
 http://people.brunel.ac.uk/~mastjjb/jeb/orlib/mknapinfo.html
