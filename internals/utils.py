@@ -6,8 +6,6 @@ from cplex._internal._subinterfaces import CutType
 import sys
 
 def MKPpopulate(name: str) -> Tuple:
-    # populateMKP
-
     '''
     This function extracts the raw data from a .txt file and populates the objective function coefficients
     array, the constraints coefficients matrix A and the right hand side b array
@@ -21,7 +19,7 @@ def MKPpopulate(name: str) -> Tuple:
         b -- right hand side values (shape = 1 * m)
     '''
     
-    # Opening .txt file to read raw data of an instance
+    # Opening .txt file in order to read the raw data of an instance
     file = open(str(name), 'r')
     x = []
     for line in file:
@@ -29,7 +27,6 @@ def MKPpopulate(name: str) -> Tuple:
         for i in range(len(splitLine)):
             x.append(splitLine[i])
     file.close()
-    
     
     # Define parameters
     NumColumns, NumRows, BestOF = int(x.pop(0)), int(x.pop(0)), float(x.pop(0))
@@ -46,7 +43,6 @@ def MKPpopulate(name: str) -> Tuple:
     assert type(c) == np.ndarray
     assert len(c)  == NumColumns
     
-    
     # Populating A matrix (size NumRows * NumColumns)
     ConstCoef = np.array([float(x.pop(0)) for i in range(int(NumRows * NumColumns))])    
     
@@ -57,13 +53,11 @@ def MKPpopulate(name: str) -> Tuple:
     
     assert A.shape == (NumRows, NumColumns)
     
-    
     # Populating the RHS
     b = np.array([float(x.pop(0)) for i in range(int(NumRows))])
 
     assert len(b) == NumRows
     assert type(b) == np.ndarray
-    
 
     return (c, A, b)
 
