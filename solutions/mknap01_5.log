@@ -35,7 +35,7 @@ Root relaxation solution time = 0.00 sec. (0.04 ticks)
       0     0    12459.3333     2                    Fract: 1        5         
 Detecting symmetries...
       0     2    12459.3333     2                  12457.7391        5         
-Elapsed time = 0.02 sec. (0.46 ticks, tree = 0.01 MB, solutions = 0)
+Elapsed time = 0.00 sec. (0.46 ticks, tree = 0.01 MB, solutions = 0)
 *    14    14      integral     0    11510.0000    12445.5263       32    8.13%
 *    23     5      integral     0    12390.0000    12445.5263       42    0.45%
 *    26     3      integral     0    12400.0000    12429.8889       46    0.24%
@@ -43,8 +43,8 @@ Elapsed time = 0.02 sec. (0.46 ticks, tree = 0.01 MB, solutions = 0)
 Gomory fractional cuts applied:  1
 
 Root node processing (before b&c):
-  Real time             =    0.02 sec. (0.47 ticks)
+  Real time             =    0.00 sec. (0.47 ticks)
 Sequential b&c:
   Real time             =    0.00 sec. (0.28 ticks)
                           ------------
-Total (root+branch&cut) =    0.02 sec. (0.74 ticks)
+Total (root+branch&cut) =    0.00 sec. (0.74 ticks)
