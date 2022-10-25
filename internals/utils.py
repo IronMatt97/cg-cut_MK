@@ -1,4 +1,3 @@
-import utils
 from docplex.mp.model import Model
 from typing import Tuple
 import numpy as np

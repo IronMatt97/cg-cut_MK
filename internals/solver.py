@@ -1,10 +1,7 @@
-from utils import MKPpopulate, get_cut_stats
+from internals.utils import MKPpopulate, get_cut_stats
 from matplotlib.cbook import report_memory
 from docplex.mp.model import Model
-import solver
 import json
-import sys
-import os
 
 
 # This function solves a specific problem instance
@@ -54,20 +51,4 @@ def solveCplex(instance) :
         output_file.write(json_)
 
 
-
-
-if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        for file in os.listdir("istances/") :
-            print("\n---------------------------------------------------")
-            print("Solving problem instance named "+file+";\n")
-            solveCplex("istances/"+file)
-        print("---------------------------------------------------")
-    elif len(sys.argv) == 2:
-        print("\n---------------------------------------------------")
-        print("Solving problem instance named "+sys.argv[1])
-        solveCplex(sys.argv[1])
-        print("---------------------------------------------------")
-    else:
-        print("Invalid input.\nUsage:\n\t--> python solver.py\nor, in order to solve a specific instance\n\t--> python solver.py {instace}.txt")
 
