@@ -1,10 +1,10 @@
 <?xml version = "1.0" encoding="UTF-8" standalone="yes"?>
 <CPLEXSolution version="1.2">
  <header
-   problemName="mknap01_6"
+   problemName="mknap02_1"
    solutionName="incumbent"
    solutionIndex="-1"
-   objectiveValue="10672.345878167762"
+   objectiveValue="16612.82123411978"
    solutionTypeValue="3"
    solutionTypeString="primal"
    solutionStatusValue="101"
@@ -21,17 +21,17 @@
    maxIntInfeas="0"
    maxPrimalInfeas="0"
    maxX="1"
-   maxSlack="79.776728950566223"/>
+   maxSlack="66.896551724137908"/>
  <linearConstraints>
   <constraint name="c0" index="0" slack="0"/>
   <constraint name="c1" index="1" slack="0"/>
   <constraint name="c2" index="2" slack="0"/>
-  <constraint name="c3" index="3" slack="79.776728950566223"/>
+  <constraint name="c3" index="3" slack="66.896551724137908"/>
   <constraint name="c4" index="4" slack="0"/>
  </linearConstraints>
  <variables>
-  <variable name="x0" index="0" value="1"/>
-  <variable name="x1" index="1" value="0.54509272141309895"/>
+  <variable name="x0" index="0" value="0"/>
+  <variable name="x1" index="1" value="0.13248638838475496"/>
   <variable name="x2" index="2" value="0"/>
   <variable name="x3" index="3" value="1"/>
   <variable name="x4" index="4" value="0"/>
@@ -47,14 +47,14 @@
   <variable name="x14" index="14" value="1"/>
   <variable name="x15" index="15" value="1"/>
   <variable name="x16" index="16" value="1"/>
-  <variable name="x17" index="17" value="0.69619428350034329"/>
+  <variable name="x17" index="17" value="0"/>
   <variable name="x18" index="18" value="1"/>
   <variable name="x19" index="19" value="1"/>
-  <variable name="x20" index="20" value="0.5618935244703519"/>
+  <variable name="x20" index="20" value="0.39745916515426505"/>
   <variable name="x21" index="21" value="0"/>
   <variable name="x22" index="22" value="1"/>
   <variable name="x23" index="23" value="0"/>
-  <variable name="x24" index="24" value="1"/>
+  <variable name="x24" index="24" value="0.98911070780399279"/>
   <variable name="x25" index="25" value="1"/>
   <variable name="x26" index="26" value="1"/>
   <variable name="x27" index="27" value="1"/>
@@ -62,15 +62,26 @@
   <variable name="x29" index="29" value="1"/>
   <variable name="x30" index="30" value="1"/>
   <variable name="x31" index="31" value="1"/>
-  <variable name="x32" index="32" value="0.29271965200852357"/>
+  <variable name="x32" index="32" value="0"/>
   <variable name="x33" index="33" value="1"/>
   <variable name="x34" index="34" value="1"/>
-  <variable name="x35" index="35" value="1"/>
+  <variable name="x35" index="35" value="0.55989110707803968"/>
   <variable name="x36" index="36" value="1"/>
   <variable name="x37" index="37" value="1"/>
   <variable name="x38" index="38" value="1"/>
+  <variable name="x39" index="39" value="1"/>
+  <variable name="x40" index="40" value="1"/>
+  <variable name="x41" index="41" value="1"/>
+  <variable name="x42" index="42" value="1"/>
+  <variable name="x43" index="43" value="0"/>
+  <variable name="x44" index="44" value="1"/>
+  <variable name="x45" index="45" value="0"/>
+  <variable name="x46" index="46" value="1"/>
+  <variable name="x47" index="47" value="1"/>
+  <variable name="x48" index="48" value="1"/>
+  <variable name="x49" index="49" value="1"/>
  </variables>
  <objectiveValues>
-  <objective index="0" name="" value="10672.345878167762"/>
+  <objective index="0" name="" value="16612.821234119783"/>
  </objectiveValues>
 </CPLEXSolution>

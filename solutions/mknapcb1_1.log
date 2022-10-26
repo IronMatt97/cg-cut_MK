@@ -1,94 +1,137 @@
-Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
-CPXPARAM_Read_DataCheck                          1
-CPXPARAM_Threads                                 1
-CPXPARAM_MIP_Cuts_Cliques                        -1
-CPXPARAM_MIP_Cuts_Covers                         -1
-CPXPARAM_MIP_Cuts_FlowCovers                     -1
-CPXPARAM_MIP_Cuts_Implied                        -1
-CPXPARAM_MIP_Cuts_PathCut                        -1
-CPXPARAM_MIP_Cuts_MIRCut                         -1
-CPXPARAM_MIP_Cuts_ZeroHalfCut                    -1
-CPXPARAM_MIP_Cuts_LiftProj                       -1
-CPXPARAM_MIP_Strategy_HeuristicFreq              -1
-Tried aggregator 1 time.
-Reduced MIP has 5 rows, 100 columns, and 500 nonzeros.
-Reduced MIP has 100 binaries, 0 generals, 0 SOSs, and 0 indicators.
-Presolve time = 0.00 sec. (0.39 ticks)
-Probing time = 0.00 sec. (0.03 ticks)
-Tried aggregator 1 time.
-Detecting symmetries...
-Reduced MIP has 5 rows, 100 columns, and 500 nonzeros.
-Reduced MIP has 100 binaries, 0 generals, 0 SOSs, and 0 indicators.
-Presolve time = 0.00 sec. (0.45 ticks)
-Probing time = 0.00 sec. (0.03 ticks)
-MIP emphasis: balance optimality and feasibility.
-MIP search method: dynamic search.
-Parallel mode: none, using 1 thread.
-Root relaxation solution time = 0.00 sec. (0.16 ticks)
-
-        Nodes                                         Cuts/
-   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
-
-      0     0    24585.9027     5                  24585.9027       17         
-      0     0    24583.5639     6                    Fract: 1       21         
-Detecting symmetries...
-      0     2    24583.5639     6                  24583.5251       21         
-Elapsed time = 0.01 sec. (1.75 ticks, tree = 0.01 MB, solutions = 0)
-*    84    84      integral     0    22156.0000    24575.9265      235   10.92%
-*    95    93      integral     0    22185.0000    24575.9265      247   10.78%
-*   105    96      integral     0    22531.0000    24575.9265      257    9.08%
-*   115    61      integral     0    23556.0000    24575.9265      264    4.33%
-*   169   113      integral     0    23640.0000    24574.7916      430    3.95%
-*   173   113      integral     0    23941.0000    24574.7916      436    2.65%
-*   216   151      integral     0    23942.0000    24574.7311      522    2.64%
-*   287   201      integral     0    24055.0000    24574.2492      659    2.16%
-
-Performing restart 1
-
-Repeating presolve.
-Tried aggregator 1 time.
-Reduced MIP has 5 rows, 100 columns, and 500 nonzeros.
-Reduced MIP has 100 binaries, 0 generals, 0 SOSs, and 0 indicators.
-Presolve time = 0.00 sec. (0.39 ticks)
-Tried aggregator 1 time.
-Reduced MIP has 5 rows, 100 columns, and 500 nonzeros.
-Reduced MIP has 100 binaries, 0 generals, 0 SOSs, and 0 indicators.
-Presolve time = 0.00 sec. (0.45 ticks)
-Represolve time = 0.00 sec. (1.13 ticks)
-    499     0    24579.4901     7    24055.0000      Fract: 1     1215    2.14%
-    499     0    24576.8200     8    24055.0000      Fract: 1     1220    2.14%
-    499     0    24576.4540     9    24055.0000      Fract: 1     1223    2.14%
-*   898   336      integral     0    24147.0000    24570.3464     1908    1.75%
-*  1211   553      integral     0    24247.0000    24565.6601     2516    1.31%
-*  2107  1306      integral     0    24248.0000    24548.6062     4194    1.24%
-*  3822  2695      integral     0    24260.0000    24535.1953     7277    1.13%
-*  4489  3165      integral     0    24287.0000    24531.5624     8463    1.01%
-*  4751  3353      integral     0    24291.0000    24529.5502     8884    0.98%
-*  6230  3317      integral     0    24381.0000    24523.5729    11556    0.58%
-   9178  5090    24414.9839     5    24381.0000    24507.6220    17163    0.52%
-
-Performing restart 2
-
-Repeating presolve.
-Tried aggregator 1 time.
-MIP Presolve eliminated 0 rows and 33 columns.
-Reduced MIP has 5 rows, 67 columns, and 335 nonzeros.
-Reduced MIP has 67 binaries, 0 generals, 0 SOSs, and 0 indicators.
-Presolve time = 0.00 sec. (0.22 ticks)
-Tried aggregator 1 time.
-Reduced MIP has 5 rows, 67 columns, and 335 nonzeros.
-Reduced MIP has 67 binaries, 0 generals, 0 SOSs, and 0 indicators.
-Presolve time = 0.00 sec. (0.25 ticks)
-Represolve time = 0.00 sec. (1.19 ticks)
-  17634  3901    24442.9141     5    24381.0000    24489.9370    34496    0.45%
-  25511  5033    24444.1437     5    24381.0000    24455.9324    52653    0.31%
-  32156  3500    24392.4756     5    24381.0000    24428.1687    68091    0.19%
-
-Gomory fractional cuts applied:  4
-
-Root node processing (before b&c):
-  Real time             =    0.01 sec. (1.76 ticks)
-Sequential b&c:
-  Real time             =    1.80 sec. (1161.66 ticks)
-                          ------------
-Total (root+branch&cut) =    1.81 sec. (1163.42 ticks)
+<?xml version = "1.0" encoding="UTF-8" standalone="yes"?>
+<CPLEXSolution version="1.2">
+ <header
+   problemName="mknapcb1_1"
+   solutionName="incumbent"
+   solutionIndex="-1"
+   objectiveValue="24585.902722021347"
+   solutionTypeValue="3"
+   solutionTypeString="primal"
+   solutionStatusValue="101"
+   solutionStatusString="integer optimal solution"
+   solutionMethodString="mip"
+   primalFeasible="1"
+   dualFeasible="1"
+   MIPNodes="0"
+   MIPIterations="17"
+   writeLevel="1"/>
+ <quality
+   epInt="1.0000000000000001e-05"
+   epRHS="9.9999999999999995e-07"
+   maxIntInfeas="0"
+   maxPrimalInfeas="1.8189894035458565e-12"
+   maxX="1"
+   maxSlack="1.8189894035458565e-12"/>
+ <linearConstraints>
+  <constraint name="c0" index="0" slack="0"/>
+  <constraint name="c1" index="1" slack="0"/>
+  <constraint name="c2" index="2" slack="0"/>
+  <constraint name="c3" index="3" slack="0"/>
+  <constraint name="c4" index="4" slack="-1.8189894035458565e-12"/>
+ </linearConstraints>
+ <variables>
+  <variable name="x0" index="0" value="0"/>
+  <variable name="x1" index="1" value="1"/>
+  <variable name="x2" index="2" value="0"/>
+  <variable name="x3" index="3" value="0.61324801443221366"/>
+  <variable name="x4" index="4" value="0.47281296898063124"/>
+  <variable name="x5" index="5" value="0"/>
+  <variable name="x6" index="6" value="1"/>
+  <variable name="x7" index="7" value="0"/>
+  <variable name="x8" index="8" value="1"/>
+  <variable name="x9" index="9" value="0"/>
+  <variable name="x10" index="10" value="1"/>
+  <variable name="x11" index="11" value="0"/>
+  <variable name="x12" index="12" value="1"/>
+  <variable name="x13" index="13" value="0"/>
+  <variable name="x14" index="14" value="0"/>
+  <variable name="x15" index="15" value="0"/>
+  <variable name="x16" index="16" value="0"/>
+  <variable name="x17" index="17" value="1"/>
+  <variable name="x18" index="18" value="1"/>
+  <variable name="x19" index="19" value="0"/>
+  <variable name="x20" index="20" value="0"/>
+  <variable name="x21" index="21" value="0"/>
+  <variable name="x22" index="22" value="0"/>
+  <variable name="x23" index="23" value="1"/>
+  <variable name="x24" index="24" value="0"/>
+  <variable name="x25" index="25" value="0.075787522369140964"/>
+  <variable name="x26" index="26" value="1"/>
+  <variable name="x27" index="27" value="0"/>
+  <variable name="x28" index="28" value="1"/>
+  <variable name="x29" index="29" value="1"/>
+  <variable name="x30" index="30" value="0"/>
+  <variable name="x31" index="31" value="1"/>
+  <variable name="x32" index="32" value="0"/>
+  <variable name="x33" index="33" value="0"/>
+  <variable name="x34" index="34" value="0.33984140915783956"/>
+  <variable name="x35" index="35" value="0"/>
+  <variable name="x36" index="36" value="0"/>
+  <variable name="x37" index="37" value="0"/>
+  <variable name="x38" index="38" value="0"/>
+  <variable name="x39" index="39" value="0"/>
+  <variable name="x40" index="40" value="0"/>
+  <variable name="x41" index="41" value="0"/>
+  <variable name="x42" index="42" value="0"/>
+  <variable name="x43" index="43" value="1"/>
+  <variable name="x44" index="44" value="0"/>
+  <variable name="x45" index="45" value="0"/>
+  <variable name="x46" index="46" value="0"/>
+  <variable name="x47" index="47" value="0"/>
+  <variable name="x48" index="48" value="0"/>
+  <variable name="x49" index="49" value="1"/>
+  <variable name="x50" index="50" value="0"/>
+  <variable name="x51" index="51" value="0"/>
+  <variable name="x52" index="52" value="0"/>
+  <variable name="x53" index="53" value="0"/>
+  <variable name="x54" index="54" value="0"/>
+  <variable name="x55" index="55" value="0"/>
+  <variable name="x56" index="56" value="1"/>
+  <variable name="x57" index="57" value="0"/>
+  <variable name="x58" index="58" value="0"/>
+  <variable name="x59" index="59" value="0"/>
+  <variable name="x60" index="60" value="0"/>
+  <variable name="x61" index="61" value="1"/>
+  <variable name="x62" index="62" value="1"/>
+  <variable name="x63" index="63" value="0"/>
+  <variable name="x64" index="64" value="0"/>
+  <variable name="x65" index="65" value="1"/>
+  <variable name="x66" index="66" value="0"/>
+  <variable name="x67" index="67" value="0"/>
+  <variable name="x68" index="68" value="1"/>
+  <variable name="x69" index="69" value="0"/>
+  <variable name="x70" index="70" value="1"/>
+  <variable name="x71" index="71" value="0"/>
+  <variable name="x72" index="72" value="0"/>
+  <variable name="x73" index="73" value="1"/>
+  <variable name="x74" index="74" value="0"/>
+  <variable name="x75" index="75" value="0"/>
+  <variable name="x76" index="76" value="1"/>
+  <variable name="x77" index="77" value="0"/>
+  <variable name="x78" index="78" value="1"/>
+  <variable name="x79" index="79" value="0"/>
+  <variable name="x80" index="80" value="0"/>
+  <variable name="x81" index="81" value="0"/>
+  <variable name="x82" index="82" value="0"/>
+  <variable name="x83" index="83" value="0"/>
+  <variable name="x84" index="84" value="1"/>
+  <variable name="x85" index="85" value="1"/>
+  <variable name="x86" index="86" value="0"/>
+  <variable name="x87" index="87" value="0"/>
+  <variable name="x88" index="88" value="0"/>
+  <variable name="x89" index="89" value="0"/>
+  <variable name="x90" index="90" value="0"/>
+  <variable name="x91" index="91" value="0.081232753520658563"/>
+  <variable name="x92" index="92" value="1"/>
+  <variable name="x93" index="93" value="0"/>
+  <variable name="x94" index="94" value="0"/>
+  <variable name="x95" index="95" value="1"/>
+  <variable name="x96" index="96" value="0"/>
+  <variable name="x97" index="97" value="0"/>
+  <variable name="x98" index="98" value="1"/>
+  <variable name="x99" index="99" value="0"/>
+ </variables>
+ <objectiveValues>
+  <objective index="0" name="" value="24585.90272202135"/>
+ </objectiveValues>
+</CPLEXSolution>

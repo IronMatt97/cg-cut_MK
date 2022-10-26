@@ -1,49 +1,62 @@
-Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
-CPXPARAM_Read_DataCheck                          1
-CPXPARAM_Threads                                 1
-CPXPARAM_MIP_Cuts_Cliques                        -1
-CPXPARAM_MIP_Cuts_Covers                         -1
-CPXPARAM_MIP_Cuts_FlowCovers                     -1
-CPXPARAM_MIP_Cuts_Implied                        -1
-CPXPARAM_MIP_Cuts_PathCut                        -1
-CPXPARAM_MIP_Cuts_MIRCut                         -1
-CPXPARAM_MIP_Cuts_ZeroHalfCut                    -1
-CPXPARAM_MIP_Cuts_LiftProj                       -1
-CPXPARAM_MIP_Strategy_HeuristicFreq              -1
-Tried aggregator 1 time.
-MIP Presolve modified 2 coefficients.
-Reduced MIP has 10 rows, 20 columns, and 188 nonzeros.
-Reduced MIP has 20 binaries, 0 generals, 0 SOSs, and 0 indicators.
-Presolve time = 0.00 sec. (0.07 ticks)
-Probing time = 0.00 sec. (0.01 ticks)
-Tried aggregator 1 time.
-Detecting symmetries...
-Reduced MIP has 10 rows, 20 columns, and 188 nonzeros.
-Reduced MIP has 20 binaries, 0 generals, 0 SOSs, and 0 indicators.
-Presolve time = 0.00 sec. (0.09 ticks)
-Probing time = 0.00 sec. (0.01 ticks)
-MIP emphasis: balance optimality and feasibility.
-MIP search method: dynamic search.
-Parallel mode: none, using 1 thread.
-Root relaxation solution time = 0.00 sec. (0.03 ticks)
-
-        Nodes                                         Cuts/
-   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
-
-      0     0     6155.3333     2                   6155.3333        5         
-      0     0     6148.4215     3                    Fract: 1        7         
-      0     0     6139.4737     3                    Fract: 1       10         
-Detecting symmetries...
-      0     2     6139.4737     3                   6138.5632       10         
-Elapsed time = 0.00 sec. (0.38 ticks, tree = 0.01 MB, solutions = 0)
-*    18     4      integral     0     6110.0000     6127.9068       40    0.29%
-*    21     0      integral     0     6120.0000     6122.8653       43    0.05%
-
-Gomory fractional cuts applied:  2
-
-Root node processing (before b&c):
-  Real time             =    0.00 sec. (0.38 ticks)
-Sequential b&c:
-  Real time             =    0.00 sec. (0.19 ticks)
-                          ------------
-Total (root+branch&cut) =    0.00 sec. (0.57 ticks)
+<?xml version = "1.0" encoding="UTF-8" standalone="yes"?>
+<CPLEXSolution version="1.2">
+ <header
+   problemName="mknap01_4"
+   solutionName="incumbent"
+   solutionIndex="-1"
+   objectiveValue="6155.3333333333339"
+   solutionTypeValue="3"
+   solutionTypeString="primal"
+   solutionStatusValue="101"
+   solutionStatusString="integer optimal solution"
+   solutionMethodString="mip"
+   primalFeasible="1"
+   dualFeasible="1"
+   MIPNodes="0"
+   MIPIterations="5"
+   writeLevel="1"/>
+ <quality
+   epInt="1.0000000000000001e-05"
+   epRHS="9.9999999999999995e-07"
+   maxIntInfeas="0"
+   maxPrimalInfeas="0"
+   maxX="1"
+   maxSlack="53.5"/>
+ <linearConstraints>
+  <constraint name="c0" index="0" slack="53.5"/>
+  <constraint name="c1" index="1" slack="0"/>
+  <constraint name="c2" index="2" slack="49.933333333333337"/>
+  <constraint name="c3" index="3" slack="34.099999999999994"/>
+  <constraint name="c4" index="4" slack="33.183333333333337"/>
+  <constraint name="c5" index="5" slack="42.433333333333337"/>
+  <constraint name="c6" index="6" slack="27.400000000000006"/>
+  <constraint name="c7" index="7" slack="24.450000000000017"/>
+  <constraint name="c8" index="8" slack="16.75"/>
+  <constraint name="c9" index="9" slack="0"/>
+ </linearConstraints>
+ <variables>
+  <variable name="x0" index="0" value="1"/>
+  <variable name="x1" index="1" value="1"/>
+  <variable name="x2" index="2" value="0"/>
+  <variable name="x3" index="3" value="0"/>
+  <variable name="x4" index="4" value="0"/>
+  <variable name="x5" index="5" value="0"/>
+  <variable name="x6" index="6" value="0"/>
+  <variable name="x7" index="7" value="0"/>
+  <variable name="x8" index="8" value="1"/>
+  <variable name="x9" index="9" value="0.4333333333333329"/>
+  <variable name="x10" index="10" value="0"/>
+  <variable name="x11" index="11" value="0"/>
+  <variable name="x12" index="12" value="0"/>
+  <variable name="x13" index="13" value="1"/>
+  <variable name="x14" index="14" value="1"/>
+  <variable name="x15" index="15" value="0.95000000000000084"/>
+  <variable name="x16" index="16" value="1"/>
+  <variable name="x17" index="17" value="1"/>
+  <variable name="x18" index="18" value="1"/>
+  <variable name="x19" index="19" value="1"/>
+ </variables>
+ <objectiveValues>
+  <objective index="0" name="" value="6155.3333333333339"/>
+ </objectiveValues>
+</CPLEXSolution>
