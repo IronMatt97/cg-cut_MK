@@ -1,8 +1,20 @@
-from internals.utils import MKPpopulate, print_solution , print_final_tableau, generate_gomory_cuts
+from internals.utils import *
+from time import *
+from cplex.callbacks import MIPInfoCallback
 import cplex
-
+import matplotlib.pyplot as plt
 import os
 
+class TimeLimitCallback(MIPInfoCallback):
+    def __call__(self):
+        if not self.aborted and self.has_incumbent():
+            gap = 100.0 * self.get_MIP_relative_gap()
+            timeused = self.get_time() - self.starttime
+            if timeused > self.timelimit:
+                print("Good enough solution at", timeused, "sec., gap =",
+                      gap, "%, quitting.")
+                self.aborted = True
+                self.abort()
 
 # This function solves a specific problem instance
 def solveCplex(instance) :
@@ -17,6 +29,7 @@ def solveCplex(instance) :
             os.makedirs("solutions/"+name)
     if not os.path.exists("lp/"+name):
             os.makedirs("lp/"+name)
+   
     path_base_log = str("solutions/"+name)
     path_base_lp = str("lp/"+name)
 
@@ -50,7 +63,11 @@ def solveCplex(instance) :
         params = mkp.parameters
         # Disable presolve 
         params.preprocessing.presolve.set(0) 
-            
+        # Register Callback 
+        timelim_cb = mkp.register_callback(TimeLimitCallback)
+        # Set time limit
+        timelim_cb.timelimit = 60*3  #3 min max
+        timelim_cb.aborted = False
         # Add variables --------------------------------------------------------------------
         mkp.variables.add(names= ["x"+str(i) for i in range(nCols)])
     
@@ -66,6 +83,10 @@ def solveCplex(instance) :
         for i in range(nCols): 
             mkp.objective.set_linear([(i, c[i])])
     
+        # Start time 
+        timelim_cb.starttime = mkp.get_time()
+        start_time = timelim_cb.starttime
+
         # Resolve the problem instance
         mkp.solve()
        
@@ -73,6 +94,7 @@ def solveCplex(instance) :
         print_solution(mkp)
         mkp.write(path_base_lp+"/0_cut.lp")
         mkp.solution.write(path_base_log+"/0_cut.log")
+        
 
         # Generate gormory cuts
         BinvA, n_cuts, b_bar = print_final_tableau(mkp)
@@ -88,6 +110,8 @@ def solveCplex(instance) :
             mkp.write(path_base_lp+"/"+str(i+1)+"_cut.lp")
             mkp.solution.write(path_base_log+"/"+str(i+1)+"_cut.log")
         
+        end_time = mkp.get_time()
+        print("TIME ", end_time)
         mkp.end()
         pass
 

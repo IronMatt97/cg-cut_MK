@@ -3,9 +3,8 @@ from typing import Tuple
 import numpy as np
 import fractions
 from cplex._internal._subinterfaces import CutType
-import sys
-import cplex
 
+        
 def MKPpopulate(name: str) -> Tuple:
     '''
     This function extracts the raw data from a .txt file and populates the objective function coefficients
@@ -34,7 +33,7 @@ def MKPpopulate(name: str) -> Tuple:
     print('This instance has %d variables and %d constraints' %(NumColumns, NumRows))
 
     if BestOF != float(0):
-        print('Best known integer objective value for this instance = ', BestOF)
+        print('Best known integer objective value for this instance =  ', BestOF)
     else:
         print('Best integer objective value for this instance is not indicated')
     
@@ -132,19 +131,6 @@ def get_A_matrix(prob):
                 A[i, j] = r.val[r.ind.index(j)]
     return A
 
-
-def get_plottable_cut(prob, cut_row, cut_rhs, A, ncol):
-    cut_row = np.append(cut_row, cut_rhs)
-    b = np.array(prob.linear_constraints.get_rhs())
-    A = np.append(A, b.reshape(-1, 1), axis=1)
-    plotted_vars = np.nonzero(prob.objective.get_linear())[0]
-    # Assumption: plotted variables are at the beginning of the initial tableau
-    for i, sk in enumerate(range(len(plotted_vars), ncol)):
-        cut_coef = cut_row[sk]
-        cut_row -= A[i,:] * cut_coef
-    lhs = cut_row[:len(plotted_vars)]
-    rhs = cut_row[ncol:]
-    return lhs, rhs
 
 
 def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) : 
