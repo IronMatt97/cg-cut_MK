@@ -1,6 +1,8 @@
 from internals.utils import MKPpopulate, print_solution , print_final_tableau, generate_gomory_cuts
 import cplex
 
+import os
+
 
 # This function solves a specific problem instance
 def solveCplex(instance) :
@@ -11,8 +13,12 @@ def solveCplex(instance) :
     # Get the instance name
     txtname = instance.split("/")[1]    
     name = txtname.split(".txt")[0]
-    cplexlog = name+".log"
-    path_log = str("solutions/"+cplexlog)
+    if not os.path.exists("solutions/"+name):
+            os.makedirs("solutions/"+name)
+    if not os.path.exists("lp/"+name):
+            os.makedirs("lp/"+name)
+    path_base_log = str("solutions/"+name)
+    path_base_lp = str("lp/"+name)
 
     #Program variables section ####################################################
 
@@ -63,18 +69,25 @@ def solveCplex(instance) :
         # Resolve the problem instance
         mkp.solve()
        
-        # Report the results
+        # Report the results with 0 cut
         print_solution(mkp)
+        mkp.write(path_base_lp+"/0_cut.lp")
+        mkp.solution.write(path_base_log+"/0_cut.log")
+
+        # Generate gormory cuts
         BinvA, n_cuts, b_bar = print_final_tableau(mkp)
         cuts, cut_limits = generate_gomory_cuts(n_cuts,nCols, nRows, mkp, names,b_bar)
-        '''
+
+        # Add the cuts sequentially and solve the problem
         for i in range(len(cuts)):
-            mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= cuts[i])], rhs= [cut_limits[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
-        mkp.solve()
-        print_solution(mkp,mkp.solution.get_objective_value().is_integer())
-        '''
-        mkp.write("lp/"+name+".lp")
-        mkp.solution.write(path_log)
+            mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= cuts[i])], rhs= [cut_limits[i]], names = ["cut_"+str(i+1)], senses = [constraint_senses[i]])
+            mkp.set_problem_name(name+"_cut_n"+str(i+1))
+            print("PRINT SOLUTION OF "+name+" WITH N. OF GOMORY CUTS "+str(i+1))
+            mkp.solve()
+            print_solution(mkp)
+            mkp.write(path_base_lp+"/"+str(i+1)+"_cut.lp")
+            mkp.solution.write(path_base_log+"/"+str(i+1)+"_cut.log")
+        
         mkp.end()
         pass
 

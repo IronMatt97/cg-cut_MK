@@ -1,0 +1,69 @@
+<?xml version = "1.0" encoding="UTF-8" standalone="yes"?>
+<CPLEXSolution version="1.2">
+ <header
+   problemName="mknap01_3_cut_n10"
+   objectiveValue="2350.363636363596"
+   solutionTypeValue="1"
+   solutionTypeString="basic"
+   solutionStatusValue="1"
+   solutionStatusString="optimal"
+   solutionMethodString="primal"
+   primalFeasible="1"
+   dualFeasible="1"
+   simplexIterations="0"
+   writeLevel="1"/>
+ <quality
+   epRHS="9.9999999999999995e-07"
+   epOpt="9.9999999999999995e-07"
+   maxPrimalInfeas="0"
+   maxDualInfeas="0"
+   maxPrimalResidual="2.886579864025407e-14"
+   maxDualResidual="8.6686213762732223e-13"
+   maxX="1"
+   maxPi="606.90909090909133"
+   maxSlack="295.05454545454177"
+   maxRedCost="1300"
+   kappa="6.3730028178717086"/>
+ <linearConstraints>
+  <constraint name="c0" index="0" status="BS" slack="244.14545454545265" dual="-0"/>
+  <constraint name="c1" index="1" status="BS" slack="295.05454545454177" dual="-0"/>
+  <constraint name="c2" index="2" status="BS" slack="70.090909090908525" dual="-0"/>
+  <constraint name="c3" index="3" status="BS" slack="138.81818181818264" dual="-0"/>
+  <constraint name="c4" index="4" status="BS" slack="159.81818181818207" dual="-0"/>
+  <constraint name="c5" index="5" status="BS" slack="183.81818181818201" dual="-0"/>
+  <constraint name="c6" index="6" status="BS" slack="25.654545454546167" dual="-0"/>
+  <constraint name="c7" index="7" status="BS" slack="63.600000000000989" dual="-0"/>
+  <constraint name="c8" index="8" status="BS" slack="76.490909090908957" dual="-0"/>
+  <constraint name="c9" index="9" status="BS" slack="79.363636363636132" dual="-0"/>
+  <constraint name="cut_1" index="10" status="LL" slack="0" dual="465.45454545454783"/>
+  <constraint name="cut_2" index="11" status="BS" slack="0.036363636363711566" dual="-0"/>
+  <constraint name="cut_3" index="12" status="LL" slack="0" dual="181.72727272727818"/>
+  <constraint name="cut_4" index="13" status="BS" slack="0.20000000000001031" dual="-0"/>
+  <constraint name="cut_5" index="14" status="BS" slack="0.16363636363632506" dual="-0"/>
+  <constraint name="cut_6" index="15" status="LL" slack="0" dual="15.63636363636278"/>
+  <constraint name="cut_7" index="16" status="BS" slack="0.32727272727271317" dual="-0"/>
+  <constraint name="cut_8" index="17" status="BS" slack="0.28727272727274739" dual="-0"/>
+  <constraint name="cut_9" index="18" status="LL" slack="0" dual="606.90909090909133"/>
+  <constraint name="cut_10" index="19" status="BS" slack="2.8380076066980564e-14" dual="-0"/>
+ </linearConstraints>
+ <variables>
+  <variable name="x0" index="0" status="LL" value="0" reducedCost="-213.81818181818551"/>
+  <variable name="x1" index="1" status="LL" value="0" reducedCost="-149.63636363636883"/>
+  <variable name="x2" index="2" status="LL" value="0" reducedCost="-732.3636363636416"/>
+  <variable name="x3" index="3" status="BS" value="0.20000000000000992" reducedCost="0"/>
+  <variable name="x4" index="4" status="UL" value="1" reducedCost="300"/>
+  <variable name="x5" index="5" status="LL" value="0" reducedCost="-255.36363636363893"/>
+  <variable name="x6" index="6" status="LL" value="0" reducedCost="-873.27272727273044"/>
+  <variable name="x7" index="7" status="LL" value="0" reducedCost="-705.72727272727423"/>
+  <variable name="x8" index="8" status="LL" value="0" reducedCost="-807.18181818182245"/>
+  <variable name="x9" index="9" status="BS" value="0.83636363636369071" reducedCost="0"/>
+  <variable name="x10" index="10" status="LL" value="0" reducedCost="-473.72727272727491"/>
+  <variable name="x11" index="11" status="BS" value="0.56363636363640257" reducedCost="0"/>
+  <variable name="x12" index="12" status="LL" value="0" reducedCost="-338.18181818182217"/>
+  <variable name="x13" index="13" status="UL" value="1" reducedCost="1300"/>
+  <variable name="x14" index="14" status="BS" value="0.16363636363623824" reducedCost="0"/>
+ </variables>
+ <objectiveValues>
+  <objective index="0" name="" value="2350.3636363635956"/>
+ </objectiveValues>
+</CPLEXSolution>
