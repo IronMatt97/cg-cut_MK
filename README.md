@@ -2,7 +2,7 @@
 ### A simple CPLEX python code for solving the Multidimensional knapsack problem
 The problem is described below:
 http://people.brunel.ac.uk/~mastjjb/jeb/orlib/mknapinfo.html
-_____________________________________________________
+
 ## Gomory Cuts algorithm
 #todo
 ## Tests
@@ -20,9 +20,9 @@ https://www.ibm.com/support/knowledgecenter/SSSA5P_12.8.0/ilog.odms.cplex.help/C
 - clone this repo
 
 ## Running
-```python solver.py [test_name]```
+```python main.py [test_name]```
 
-- It will generate a file called test_name_sol.txt in the solutions directory.
+- It will generate files in solutions/[test_name] and lp/[test_name]
 
 
 
