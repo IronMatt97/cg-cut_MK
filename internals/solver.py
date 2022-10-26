@@ -1,5 +1,5 @@
 from pprint import pprint
-from internals.utils import MKPpopulate, get_cut_stats
+from internals.utils import MKPpopulate, get_cut_stats, print_solution , print_final_tableau, get_p9, generate_gomory_cuts
 from matplotlib.cbook import report_memory
 import cplex 
 import json
@@ -51,22 +51,12 @@ def solveCplex(instance) :
         my_problem.set_problem_name(name)
         my_problem.set_problem_name(name)
         my_problem.objective.set_sense(my_problem.objective.sense.maximize)
-
         # Parameters Tweak 
         params = my_problem.parameters
-        params.workmem.set(8192)
+        # params.workmem.set(8192)
         # Disable presolve 
-        params.preprocessing.presolve = 0 
-        params.mip.strategy.heuristicfreq = -1
-        params.mip.cuts.mircut = -1
-        params.mip.cuts.implied = -1
-        params.mip.cuts.gomory = -1  
-        params.mip.cuts.flowcovers = -1
-        params.mip.cuts.pathcut = -1
-        params.mip.cuts.liftproj = -1
-        params.mip.cuts.zerohalfcut = -1
-        params.mip.cuts.cliques = -1
-        params.mip.cuts.covers = -1
+        params.preprocessing.presolve.set(0) 
+       
             
         # Add variables --------------------------------------------------------------------
         print("\n ------ \n")
@@ -81,7 +71,7 @@ def solveCplex(instance) :
         for i in range(nCols):
             my_problem.variables.set_lower_bounds(i, lower_bounds[i])
             my_problem.variables.set_upper_bounds(i, upper_bounds[i])
-            my_problem.variables.set_types(names[i], my_problem.variables.type.continuous)
+            #my_problem.variables.set_types(names[i], my_problem.variables.type.continuous)
 
         print("\n ------ \n")
 
@@ -112,21 +102,20 @@ def solveCplex(instance) :
     
         # Resolve the problem instance
         my_problem.solve()
+       
         # Report the results
-        #cuts=get_cut_stats(mkp)
-        #print("\n\t-Cuts stats:\n\t", cuts)
-        #print("\n\t-Total number of cuts = {0}\n".format(sum(nk for _, nk in cuts.items())))
-        if not my_problem.solution.get_objective_value().is_integer() : 
-            iterateGomory(my_problem)
-        
-        print("FINAL REPORT:")
-        print(my_problem.solution.get_values())
+        print_solution(my_problem,my_problem.solution.get_objective_value().is_integer())
+        BinvA, n_cuts, b_bar = print_final_tableau(my_problem)
+        cuts = generate_gomory_cuts(n_cuts,nCols, nRows, my_problem, names,b_bar)
+
+        for i in range(len(cuts)) : 
+             my_problem.linear_constraints.add(cuts[i])
+
+        my_problem.solve()
         my_problem.write("lp/"+name+".lp")
         my_problem.solution.write(path_log)
-        
         my_problem.end()
         pass
-
 
 
 
@@ -135,9 +124,17 @@ def solveCplex(instance) :
 def iterateGomory(mkp) : 
     print("UP : ",mkp.solution.get_objective_value())
     iter = 0 
+    mkp.write("lp/"+mkp.get_problem_name()+"_iter_"+str(iter)+".lp")
+    
+
     #binvcol = mkp.solution.advanced.binvcol()
    # binvrow = mkp.solution.advanced.binvrow()
    # binvacol = mkp.solution.advanced.binvacol()
    # binvarow = mkp.solution.advanced.binvarow()
 
 
+def SolveProb() :
+    prob = get_p9()
+    prob.solve()
+    print_solution(prob)
+    print_final_tableau(prob);

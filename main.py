@@ -10,6 +10,7 @@ if __name__ == '__main__':
             print("\n---------------------------------------------------")
             print("Solving problem instance named "+file+";\n")
             solveCplex("istances/"+file)
+            #SolveProb()
         print("---------------------------------------------------")
     elif len(sys.argv) == 2:
         print("\n---------------------------------------------------")

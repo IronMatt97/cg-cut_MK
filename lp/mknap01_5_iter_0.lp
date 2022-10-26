@@ -1,5 +1,5 @@
 \ENCODING=ISO-8859-1
-\Problem name: mknap00_0
+\Problem name: mknap01_5
 
 Maximize
  obj1: 100 x0 + 220 x1 + 90 x2 + 400 x3 + 300 x4 + 400 x5 + 205 x6 + 120 x7
