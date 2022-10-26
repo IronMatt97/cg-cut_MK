@@ -62,30 +62,7 @@ def MKPpopulate(name: str) -> Tuple:
 
     return (c, A, b)
 
-def get_cut_stats(mdl):
-    """ Computes a dicitonary of cut name -> number of cuts used
-    Args:
-        mdl: an instance of `docplex.mp.Model`
-    Returns:
-        a dictionary of string -> int,, from cut type to number used (nonzero).
-        Unused cut types ar enot mentioned
-    Example:
-        For delivered model "nurses"
-        # {'cover': 88, 'GUB_cover': 9, 'flow_cover': 6, 'fractional': 5, 'MIR': 9, 'zero_half': 9, 'lift_and_project': 5}
-    """
-    cut_stats = {}
-    cpx = mdl.cplex
-    cut_type_instance = CutType()
-    for ct in cut_type_instance:
-        num = cpx.solution.MIP.get_num_cuts(ct)
-        if num:
-            cutname = cut_type_instance[ct]
-            cut_stats[cutname] = num
-
-    return cut_stats
-
-
-def print_solution(prob, is_integer = False):
+def print_solution(prob):
     ncol = len(prob.variables.get_cols())
     nrow = len(prob.linear_constraints.get_rows())
     varnames = prob.variables.get_names()
@@ -155,41 +132,6 @@ def get_A_matrix(prob):
                 A[i, j] = r.val[r.ind.index(j)]
     return A
 
-def get_p9(is_integer = False, is_standard = True):
-    f      = [-1, -1, 0, 0, 0]
-    varnames = ['x1', 'x2', 's1', 's2', 's3']
-    b      = [5, 7, 26]
-    rownames = ['c1', 'c2', 'c3']
-    sense    = 'EEE'
-    if is_integer:
-        types = 'IICCC'
-    else:
-        types = 'CCCCC'
-    rows = [[['x1','x2', 's1', 's2', 's3'],[-2, 2, 1, 0, 0]],
-            [[0, 1, 2, 3, 4],[ 0, 2, 0, 1, 0]],
-            [[0, 1, 2, 3, 4],[ 5, 2, 0, 0, 1]]]
-    if not is_standard:
-        true_vars = np.nonzero(f)[0]
-        true_vars = true_vars.shape[0]
-        f = f[:true_vars]
-        varnames = varnames[:true_vars]
-        types = types[:true_vars]
-        rows = [[a[:true_vars], b[:true_vars]] for a, b in rows]
-        sense = 'LLL'    
-    nrow = len(rownames)
-    ncol = len(varnames)
-    prob = cplex.Cplex()
-    if is_integer:
-        print("integer")
-        prob.variables.add(obj = f, names = varnames, types = types)
-    else:
-        print("no integer")
-        prob.variables.add(obj = f, names = varnames)
-    prob.linear_constraints.add(lin_expr = rows, senses = sense,
-                                rhs = b, names = rownames)
-    prob.objective.set_sense(prob.objective.sense.minimize)
-    prob.parameters.preprocessing.presolve.set(0)
-    return prob
 
 def get_plottable_cut(prob, cut_row, cut_rhs, A, ncol):
     cut_row = np.append(cut_row, cut_rhs)
@@ -207,6 +149,7 @@ def get_plottable_cut(prob, cut_row, cut_rhs, A, ncol):
 
 def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) : 
     cuts = []
+    cut_limits= []
     gc_sense = [''] * n_cuts
     gc_rhs   = np.zeros(n_cuts)
     gc_lhs   = np.zeros([n_cuts, ncol])
@@ -223,6 +166,7 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
             z = np.copy(prob.solution.advanced.binvarow(i)) # Use np.copy to avoid changing the
                                                         # optimal tableau in the problem instance
             rmatbeg[cut] = idx
+            cuts.append([])
             for j in range(ncol):
                 z[j] = z[j] - np.floor(z[j])              
                 if z[j] != 0:
@@ -238,13 +182,14 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
                         num, den = (fj.numerator, fj.denominator)
                         print(f'{num}/{den} {varnames[j]} ', end='')
                 gc_lhs[i,:] = z
+                cuts[i].append(z[j])
             
             gc_rhs[cut] = b_bar[i] - np.copy(np.floor(b_bar[i])) # np.copy as above
             gc_sense[cut] = 'L'
             gc_rhs_i = fractions.Fraction(gc_rhs[cut]).limit_denominator()
             num = gc_rhs_i.numerator
             den = gc_rhs_i.denominator
-            print(f'>= {num}/{den}\n')
+            print(f'<= {num}/{den}\n')
+            cut_limits.append(gc_rhs[cut])
             cut += 1
-    return cuts
-## funzione che ritorna cut 
+    return cuts, cut_limits
