@@ -213,4 +213,5 @@ def determineOptimal(instance):
     with open(file_path_json, "w") as output_file:
         json_ = json.dumps(json.loads(json_string), indent=4, sort_keys=True)
         output_file.write(json_)
+    mkp.export_as_lp("lp/"+name+"/optimal_sol.lp")
     return mkp.solution._objective, mkp.solution.get_values
