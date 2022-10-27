@@ -68,18 +68,15 @@ def print_solution(prob):
     ncol = len(prob.variables.get_cols())
     nrow = len(prob.linear_constraints.get_rows())
     varnames = prob.variables.get_names()
-    # solution.get_status() returns an integer code
-    logging.info('Solution status = %s ' , prob.solution.get_status())
-    # the following line prints the corresponding string
-    logging.info(prob.solution.status[prob.solution.get_status()])
-    logging.info('Solution value  = %f', prob.solution.get_objective_value())
+    logging.info('                  -> Solution status = %s ' ,prob.solution.status[prob.solution.get_status()])
+    logging.info('                  -> Solution value  = %f', prob.solution.get_objective_value())
     slack = np.round(prob.solution.get_linear_slacks(), 3)
     x     = np.round(prob.solution.get_values(), 3)
-    logging.info("Variables solution: %s",x)
+    logging.info("                  -> Variables solution: %s",x)
     for i in range(nrow):
-        logging.info(f'Row {i}:  Slack = {slack[i]}')
+        logging.info(f'                  -> Row {i}:  Slack = {slack[i]}')
     for j in range(ncol):
-        logging.info(f'Column {j} (variable {varnames[j]}):  Value = {x[j]}')
+        logging.info(f'                  -> Column {j} (variable {varnames[j]}):  Value = {x[j]}')
 
 
 
@@ -93,10 +90,11 @@ def print_final_tableau(prob):
     b = prob.linear_constraints.get_rhs()
     Binv = np.array(prob.solution.advanced.binvrow())
     b_bar = np.matmul(Binv, b)
-    output_t = io.StringIO()
     idx = 0     # Compute the nonzeros
     n_cuts = 0  # Number of fractional variables (cuts to be generated)
+    logging.info('Final tableau')
     for i in range(nrow):
+        output_t = io.StringIO()
         z = prob.solution.advanced.binvarow(i)
         for j in range(ncol):
             if z[j] > 0:
@@ -114,15 +112,14 @@ def print_final_tableau(prob):
         num = b_bar_i.numerator
         den = b_bar_i.denominator
         print(f'= {num}/{den}',file=output_t)
+        contents = output_t.getvalue()
+        logging.info("%s",contents)
+        output_t.close()
         # Count the number of cuts to be generated
         if np.floor(b_bar[i]) != b_bar[i]:
             n_cuts += 1    
     
-    logging.info('Final tableau:')
-    contents = output_t.getvalue()
-    logging.info("%s",contents)
-    output_t.close()
-    logging.info(f'Cuts to generate: {n_cuts}')
+    logging.info("Cuts to generate: %d", n_cuts)
     return n_cuts , b_bar
 
 def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) : 
@@ -135,10 +132,10 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
     rmatind  = np.zeros(ncol)
     rmatval  = np.zeros(ncol)
     logging.info('Generating Gomory cuts:...')
-    output = io.StringIO()
     cut = 0  #  Index of cut to be added
     for i in range(nrow):
         idx = 0
+        output = io.StringIO()
         if np.floor(b_bar[i]) != b_bar[i]:
             print(f'Row {i+1} gives cut -> ', end = '', file=output)
             z = np.copy(prob.solution.advanced.binvarow(i)) # Use np.copy to avoid changing the
@@ -170,9 +167,10 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
             print(f'>= {num}/{den}',file=output)
             cut_limits.append(gc_rhs[cut])
             cut += 1
-    contents = output.getvalue()
-    output.close()
-    logging.info(contents)
+            contents = output.getvalue()
+            output.close()
+            logging.info(contents)
+   
     return cuts, cut_limits
 
 def determineOptimal(instance):

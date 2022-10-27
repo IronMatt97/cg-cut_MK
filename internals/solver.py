@@ -66,7 +66,7 @@ def solveCplex(instance) :
     #First of all determine the optimal solution
     optimal_value,vars = determineOptimal(instance)
     logging.info("OPTIMAL PLI SOLUTION IS %f",optimal_value)
-    logging.info("Variables: %s",vars)
+    #logging.info("Variables: %s",vars)
 
     with cplex.Cplex() as mkp,  open("cplex_log.txt", "w") as f:
         mkp.set_problem_name(name)
@@ -106,9 +106,8 @@ def solveCplex(instance) :
         mkp.solve()
        
         # Report the results with 0 cut
+        logging.info("RELAXED PL SOLUTION (UPPER BOUND)")
         print_solution(mkp)
-        logging.info("RELAXED PL SOLUTION (UPPER BOUND) IS %f",mkp.solution.get_objective_value())
-        logging.info("Values: %s",mkp.solution.get_values())
         mkp.write(path_base_lp+"/0_cut.lp")
         mkp.solution.write(path_base_log+"/0_cut.log")
         
@@ -122,7 +121,7 @@ def solveCplex(instance) :
             mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= cuts[i])], rhs= [cut_limits[i]], names = ["cut_"+str(i+1)], senses = [constraint_senses[i]])
             all_constraints.append(cuts[i])
             mkp.set_problem_name(name+"_cut_n"+str(i+1))
-            logging.info("PRINT SOLUTION OF "+name+" WITH "+str(i+1)+" GOMORY CUTS APPLIED")
+            logging.info("SOLUTION OF "+name+" WITH "+str(i+1)+" GOMORY CUTS APPLIED")
             mkp.solve()
             print_solution(mkp)
             mkp.write(path_base_lp+"/"+str(i+1)+"_cut.lp")
