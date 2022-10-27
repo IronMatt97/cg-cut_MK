@@ -1,8 +1,11 @@
+from distutils.archive_util import make_zipfile
 from docplex.mp.model import Model
 from typing import Tuple
 import numpy as np
 import fractions
 from cplex._internal._subinterfaces import CutType
+import matplotlib.pyplot as plt
+from scipy.spatial import ConvexHull
 
         
 def MKPpopulate(name: str) -> Tuple:
@@ -29,14 +32,9 @@ def MKPpopulate(name: str) -> Tuple:
     file.close()
     
     # Define parameters
-    NumColumns, NumRows, BestOF = int(x.pop(0)), int(x.pop(0)), float(x.pop(0))
+    NumColumns, NumRows = int(x.pop(0)), int(x.pop(0))
     print('This instance has %d variables and %d constraints' %(NumColumns, NumRows))
 
-    if BestOF != float(0):
-        print('Best known integer objective value for this instance =  ', BestOF)
-    else:
-        print('Best integer objective value for this instance is not indicated')
-    
     # Populating Objective Function Coefficients
     c = np.array([float(x.pop(0)) for i in range(NumColumns)])
     
@@ -66,16 +64,17 @@ def print_solution(prob):
     nrow = len(prob.linear_constraints.get_rows())
     varnames = prob.variables.get_names()
     # solution.get_status() returns an integer code
-    print('Solution status = ' , prob.solution.get_status(), ':')
+    #print('Solution status = ' , prob.solution.get_status(), ':')
     # the following line prints the corresponding string
-    print(prob.solution.status[prob.solution.get_status()])
+    #print(prob.solution.status[prob.solution.get_status()])
     print('Solution value  = ', prob.solution.get_objective_value())
     slack = np.round(prob.solution.get_linear_slacks(), 3)
     x     = np.round(prob.solution.get_values(), 3)
-    for i in range(nrow):
-        print(f'Row {i}:  Slack = {slack[i]}')
-    for j in range(ncol):
-        print(f'Column {j} (variable {varnames[j]}):  Value = {x[j]}')
+    print("Variables solution: ",x)
+    #for i in range(nrow):
+    #    print(f'Row {i}:  Slack = {slack[i]}')
+    #for j in range(ncol):
+    #    print(f'Column {j} (variable {varnames[j]}):  Value = {x[j]}')
 
 
 
@@ -91,47 +90,32 @@ def print_final_tableau(prob):
     b_bar = np.matmul(Binv, b)
 
 
-    print('\n\nFinal tableau:')
+    #print('\n\nFinal tableau:')
     idx = 0     # Compute the nonzeros
     n_cuts = 0  # Number of fractional variables (cuts to be generated)
     for i in range(nrow):
         z = prob.solution.advanced.binvarow(i)
         for j in range(ncol):
-            if z[j] > 0:
-                print('+', end='')
+            #if z[j] > 0:
+                #print('+', end='')
             zj = fractions.Fraction(z[j]).limit_denominator()
             num = zj.numerator
             den = zj.denominator
-            if num != 0 and num != den:
-                print(f'{num}/{den} {varnames[j]} ', end='')
-            elif num == den:
-                print(f'{varnames[j]} ', end='')
+            #if num != 0 and num != den:
+            #    print(f'{num}/{den} {varnames[j]} ', end='')
+            #elif num == den:
+            #    print(f'{varnames[j]} ', end='')
             if np.floor(z[j]+0.5) != 0:
                 idx += 1
         b_bar_i = fractions.Fraction(b_bar[i]).limit_denominator()
         num = b_bar_i.numerator
         den = b_bar_i.denominator
-        print(f'= {num}/{den}\n')
+        #print(f'= {num}/{den}\n')
         # Count the number of cuts to be generated
         if np.floor(b_bar[i]) != b_bar[i]:
             n_cuts += 1    
     print(f'Cuts to generate: {n_cuts}')
-    return BinvA, n_cuts , b_bar
-
-
-def get_A_matrix(prob):
-    rows = prob.linear_constraints.get_rows()
-    nrow = len(rows)
-    ncol = max([max(r.ind) for r in rows]) + 1
-
-    A = np.zeros((nrow, ncol))
-    for i, r in enumerate(prob.linear_constraints.get_rows()):
-        for j in range(ncol):
-            if j in r.ind:
-                A[i, j] = r.val[r.ind.index(j)]
-    return A
-
-
+    return n_cuts , b_bar
 
 def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) : 
     cuts = []
@@ -142,13 +126,13 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
     rmatbeg  = np.zeros(n_cuts)
     rmatind  = np.zeros(ncol)
     rmatval  = np.zeros(ncol)
-    print('\nGenerated Gomory cuts:\n')
+    #print('\nGenerated Gomory cuts:\n')
     #idx = 0
     cut = 0  #  Index of cut to be added
     for i in range(nrow):
         idx = 0
         if np.floor(b_bar[i]) != b_bar[i]:
-            print(f'Row {i+1} gives cut -> ', end = '')
+            #print(f'Row {i+1} gives cut -> ', end = '')
             z = np.copy(prob.solution.advanced.binvarow(i)) # Use np.copy to avoid changing the
                                                         # optimal tableau in the problem instance
             rmatbeg[cut] = idx
@@ -160,13 +144,13 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
                     rmatval[idx] = z[j]
                     idx +=1
                 # Print the cut
-                if z[j] > 0:
-                    print('+', end = '')
+                #if z[j] > 0:
+                #    print('+', end = '')
                 if (z[j] != 0):
                         fj = fractions.Fraction(z[j])
                         fj = fj.limit_denominator()
                         num, den = (fj.numerator, fj.denominator)
-                        print(f'{num}/{den} {varnames[j]} ', end='')
+                #        print(f'{num}/{den} {varnames[j]} ', end='')
                 gc_lhs[i,:] = z
                 cuts[i].append(z[j])
             
@@ -175,7 +159,41 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
             gc_rhs_i = fractions.Fraction(gc_rhs[cut]).limit_denominator()
             num = gc_rhs_i.numerator
             den = gc_rhs_i.denominator
-            print(f'<= {num}/{den}\n')
+            #print(f'>= {num}/{den}\n')
             cut_limits.append(gc_rhs[cut])
             cut += 1
     return cuts, cut_limits
+
+def determineOptimal(instance):
+    c, A, b = MKPpopulate(instance) 
+    nCols, nRows = range(len(c)), range(len(b))
+    # Get the instance name
+    txtname = instance.split("/")[1]    
+    name = txtname.split(".txt")[0]
+    cplexlog = name+".log"
+    # Create an empty model
+    mkp = Model(name)
+    mkp.set_log_output("solutions/"+cplexlog)
+    # Define the decision variables
+    x = mkp.binary_var_list(nCols, lb = 0, ub = 1, name = 'x')
+    constraints = mkp.add_constraints(sum(A[i][j] * x[j] for j in nCols) <= b[i] for i in nRows)
+    profit = mkp.sum(c[j] * x[j] for j in nCols)
+    mkp.add_kpi(profit, 'profit')
+    objective = mkp.maximize(profit)
+    # Parameters Tweak 
+    params = mkp.parameters
+    params.threads = 1
+    params.mip.strategy.heuristicfreq = -1
+    params.mip.cuts.mircut = -1
+    params.mip.cuts.implied = -1
+    #params.mip.cuts.gomory = -1  # We only want Gomory cuts to be done 
+    params.mip.cuts.flowcovers = -1
+    params.mip.cuts.pathcut = -1
+    params.mip.cuts.liftproj = -1
+    params.mip.cuts.zerohalfcut = -1
+    params.mip.cuts.cliques = -1
+    params.mip.cuts.covers = -1
+ 
+    # Resolve the problem instance
+    mkp.solve()
+    return mkp.solution._objective, mkp.solution.get_values
