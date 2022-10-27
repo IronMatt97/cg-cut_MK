@@ -36,6 +36,7 @@ def solveCplex(instance) :
     #Program variables section ####################################################
 
     names = []
+    all_constraints = []
     lower_bounds = []
     upper_bounds = []
     constraint_names = []
@@ -57,6 +58,12 @@ def solveCplex(instance) :
     print("\t\t... Done.")
     
     # Solver section    ############################################################
+
+    #First of all determine the optimal solution
+    optimal_value,vars = determineOptimal(instance)
+    print("\n\tOPTIMAL PLI SOLUTION IS ",optimal_value,"\n")
+    print("\n\tVariables: ",str(vars))
+
     with cplex.Cplex() as mkp:
         mkp.set_problem_name(name)
         mkp.objective.set_sense(mkp.objective.sense.maximize)
@@ -78,7 +85,7 @@ def solveCplex(instance) :
         # Add contraints -------------------------------------------------------------------
         for i in range(nRows):
             mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])], rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
-
+            all_constraints.append(A[i])
         # Add objective function -----------------------------------------------------------
         for i in range(nCols): 
             mkp.objective.set_linear([(i, c[i])])
@@ -91,62 +98,32 @@ def solveCplex(instance) :
         mkp.solve()
        
         # Report the results with 0 cut
-        print_solution(mkp)
+        #print_solution(mkp)
+        print("\n\tRELAXED PL SOLUTION (UPPER BOUND) IS "+str(mkp.solution.get_objective_value())+"\n")
+        print("\tValues: "+str(mkp.solution.get_values())+"\n")
         mkp.write(path_base_lp+"/0_cut.lp")
         mkp.solution.write(path_base_log+"/0_cut.log")
         
 
         # Generate gormory cuts
-        BinvA, n_cuts, b_bar = print_final_tableau(mkp)
-        cuts, cut_limits = generate_gomory_cuts(n_cuts,nCols, nRows, mkp, names,b_bar)
+        n_cuts, b_bar = print_final_tableau(mkp)
+        cuts, cut_limits = generate_gomory_cuts(n_cuts, nCols, nRows, mkp, names,b_bar)
 
         # Add the cuts sequentially and solve the problem
         for i in range(len(cuts)):
             mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= cuts[i])], rhs= [cut_limits[i]], names = ["cut_"+str(i+1)], senses = [constraint_senses[i]])
+            all_constraints.append(cuts[i])
             mkp.set_problem_name(name+"_cut_n"+str(i+1))
-            print("PRINT SOLUTION OF "+name+" WITH N. OF GOMORY CUTS "+str(i+1))
+            print("\t\nPRINT SOLUTION OF "+name+" WITH "+str(i+1)+" GOMORY CUTS APPLIED\n")
             mkp.solve()
             print_solution(mkp)
             mkp.write(path_base_lp+"/"+str(i+1)+"_cut.lp")
             mkp.solution.write(path_base_log+"/"+str(i+1)+"_cut.log")
         
         end_time = mkp.get_time()
-        print("TIME ", end_time)
+        elapsed_time = end_time-start_time
+        print("\n\t#Elapsed time: ", elapsed_time)
+
+
         mkp.end()
         pass
-
-'''
-    with cplex.Cplex() as mkp:
-        mkp.set_problem_name(name)
-        mkp.objective.set_sense(mkp.objective.sense.maximize)
-        params = mkp.parameters
-        # Disable presolve 
-        params.preprocessing.presolve.set(0) 
-            
-        # Add variables --------------------------------------------------------------------
-        mkp.variables.add(names= ["x"+str(i) for i in range(nCols)])
-    
-        for i in range(nCols):
-            mkp.variables.set_lower_bounds(i, lower_bounds[i])
-            mkp.variables.set_upper_bounds(i, upper_bounds[i])
-
-        # Add contraints -------------------------------------------------------------------
-        for i in range(nRows):
-            mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])], rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
-        for i in range(len(cuts)):
-            mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= cuts[i])], rhs= [cut_limits[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
-    
-        # Add objective function -----------------------------------------------------------
-        for i in range(nCols): 
-            mkp.objective.set_linear([(i, c[i])])
-    
-        # Resolve the problem instance
-        mkp.solve()
-    
-        # Report the results
-        print_solution(mkp,mkp.solution.get_objective_value().is_integer())
-        mkp.write("lp/"+name+".lp")
-        mkp.solution.write(path_log)
-        mkp.end()
-        pass
-'''

@@ -1,0 +1,37 @@
+<?xml version = "1.0" encoding="UTF-8" standalone="yes"?>
+<CPLEXSolution version="1.2">
+ <header
+   problemName="mknap0"
+   objectiveValue="7.5"
+   solutionTypeValue="1"
+   solutionTypeString="basic"
+   solutionStatusValue="1"
+   solutionStatusString="optimal"
+   solutionMethodString="dual"
+   primalFeasible="1"
+   dualFeasible="1"
+   simplexIterations="1"
+   writeLevel="1"/>
+ <quality
+   epRHS="9.9999999999999995e-07"
+   epOpt="9.9999999999999995e-07"
+   maxPrimalInfeas="0"
+   maxDualInfeas="0"
+   maxPrimalResidual="0"
+   maxDualResidual="0"
+   maxX="0.5"
+   maxPi="1.5"
+   maxSlack="0"
+   maxRedCost="2.5"
+   kappa="1.0000000000000002"/>
+ <linearConstraints>
+  <constraint name="c0" index="0" status="LL" slack="0" dual="1.5"/>
+ </linearConstraints>
+ <variables>
+  <variable name="x0" index="0" status="LL" value="0" reducedCost="-2.5"/>
+  <variable name="x1" index="1" status="BS" value="0.5" reducedCost="0"/>
+ </variables>
+ <objectiveValues>
+  <objective index="0" name="" value="7.5"/>
+ </objectiveValues>
+</CPLEXSolution>

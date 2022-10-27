@@ -1,0 +1,47 @@
+Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
+CPXPARAM_Read_DataCheck                          1
+CPXPARAM_Threads                                 1
+CPXPARAM_MIP_Cuts_Cliques                        -1
+CPXPARAM_MIP_Cuts_Covers                         -1
+CPXPARAM_MIP_Cuts_FlowCovers                     -1
+CPXPARAM_MIP_Cuts_Implied                        -1
+CPXPARAM_MIP_Cuts_PathCut                        -1
+CPXPARAM_MIP_Cuts_MIRCut                         -1
+CPXPARAM_MIP_Cuts_ZeroHalfCut                    -1
+CPXPARAM_MIP_Cuts_LiftProj                       -1
+CPXPARAM_MIP_Strategy_HeuristicFreq              -1
+Tried aggregator 1 time.
+MIP Presolve modified 47 coefficients.
+Reduced MIP has 10 rows, 10 columns, and 97 nonzeros.
+Reduced MIP has 10 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.00 sec. (0.06 ticks)
+Probing time = 0.00 sec. (0.01 ticks)
+Tried aggregator 1 time.
+Reduced MIP has 10 rows, 10 columns, and 97 nonzeros.
+Reduced MIP has 10 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.00 sec. (0.03 ticks)
+Probing time = 0.00 sec. (0.01 ticks)
+MIP emphasis: balance optimality and feasibility.
+MIP search method: dynamic search.
+Parallel mode: none, using 1 thread.
+Root relaxation solution time = 0.00 sec. (0.02 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+      0     0     9284.1132     3                   9284.1132        6         
+      0     0     9039.2000     1                    Fract: 1        8         
+      0     0     8989.3272     1                    Fract: 1        9         
+      0     2     8989.3272     1                   8975.6783        9         
+Elapsed time = 0.00 sec. (0.21 ticks, tree = 0.01 MB, solutions = 0)
+*     3     3      integral     0     8650.1000     8959.5891       18    3.58%
+*     5     1      integral     0     8706.1000     8839.4000       20    1.53%
+
+Gomory fractional cuts applied:  2
+
+Root node processing (before b&c):
+  Real time             =    0.00 sec. (0.21 ticks)
+Sequential b&c:
+  Real time             =    0.00 sec. (0.04 ticks)
+                          ------------
+Total (root+branch&cut) =    0.00 sec. (0.25 ticks)
