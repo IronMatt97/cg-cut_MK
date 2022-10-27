@@ -1,3 +1,4 @@
+from cmath import log
 from distutils.archive_util import make_zipfile
 from docplex.mp.model import Model
 from typing import Tuple
@@ -6,7 +7,11 @@ import fractions
 from cplex._internal._subinterfaces import CutType
 import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
+import json as json
+import logging
+import io
 
+logging.basicConfig(filename='log.txt', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
         
 def MKPpopulate(name: str) -> Tuple:
     '''
@@ -33,7 +38,7 @@ def MKPpopulate(name: str) -> Tuple:
     
     # Define parameters
     NumColumns, NumRows = int(x.pop(0)), int(x.pop(0))
-    print('This instance has %d variables and %d constraints' %(NumColumns, NumRows))
+    logging.info('This instance has %d variables and %d constraints' %(NumColumns, NumRows))
 
     # Populating Objective Function Coefficients
     c = np.array([float(x.pop(0)) for i in range(NumColumns)])
@@ -64,17 +69,17 @@ def print_solution(prob):
     nrow = len(prob.linear_constraints.get_rows())
     varnames = prob.variables.get_names()
     # solution.get_status() returns an integer code
-    #print('Solution status = ' , prob.solution.get_status(), ':')
+    logging.info('Solution status = %s ' , prob.solution.get_status())
     # the following line prints the corresponding string
-    #print(prob.solution.status[prob.solution.get_status()])
-    print('Solution value  = ', prob.solution.get_objective_value())
+    logging.info(prob.solution.status[prob.solution.get_status()])
+    logging.info('Solution value  = %f', prob.solution.get_objective_value())
     slack = np.round(prob.solution.get_linear_slacks(), 3)
     x     = np.round(prob.solution.get_values(), 3)
-    print("Variables solution: ",x)
-    #for i in range(nrow):
-    #    print(f'Row {i}:  Slack = {slack[i]}')
-    #for j in range(ncol):
-    #    print(f'Column {j} (variable {varnames[j]}):  Value = {x[j]}')
+    logging.info("Variables solution: %s",x)
+    for i in range(nrow):
+        logging.info(f'Row {i}:  Slack = {slack[i]}')
+    for j in range(ncol):
+        logging.info(f'Column {j} (variable {varnames[j]}):  Value = {x[j]}')
 
 
 
@@ -88,33 +93,36 @@ def print_final_tableau(prob):
     b = prob.linear_constraints.get_rhs()
     Binv = np.array(prob.solution.advanced.binvrow())
     b_bar = np.matmul(Binv, b)
-
-
-    #print('\n\nFinal tableau:')
+    output_t = io.StringIO()
     idx = 0     # Compute the nonzeros
     n_cuts = 0  # Number of fractional variables (cuts to be generated)
     for i in range(nrow):
         z = prob.solution.advanced.binvarow(i)
         for j in range(ncol):
-            #if z[j] > 0:
-                #print('+', end='')
+            if z[j] > 0:
+                print('+', end='',file=output_t)
             zj = fractions.Fraction(z[j]).limit_denominator()
             num = zj.numerator
             den = zj.denominator
-            #if num != 0 and num != den:
-            #    print(f'{num}/{den} {varnames[j]} ', end='')
-            #elif num == den:
-            #    print(f'{varnames[j]} ', end='')
+            if num != 0 and num != den:
+                print(f'{num}/{den} {varnames[j]} ', end='',file=output_t)
+            elif num == den:
+                print(f'{varnames[j]} ', end='',file=output_t)
             if np.floor(z[j]+0.5) != 0:
                 idx += 1
         b_bar_i = fractions.Fraction(b_bar[i]).limit_denominator()
         num = b_bar_i.numerator
         den = b_bar_i.denominator
-        #print(f'= {num}/{den}\n')
+        print(f'= {num}/{den}',file=output_t)
         # Count the number of cuts to be generated
         if np.floor(b_bar[i]) != b_bar[i]:
             n_cuts += 1    
-    print(f'Cuts to generate: {n_cuts}')
+    
+    logging.info('Final tableau:')
+    contents = output_t.getvalue()
+    logging.info("%s",contents)
+    output_t.close()
+    logging.info(f'Cuts to generate: {n_cuts}')
     return n_cuts , b_bar
 
 def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) : 
@@ -126,13 +134,13 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
     rmatbeg  = np.zeros(n_cuts)
     rmatind  = np.zeros(ncol)
     rmatval  = np.zeros(ncol)
-    #print('\nGenerated Gomory cuts:\n')
-    #idx = 0
+    logging.info('Generating Gomory cuts:...')
+    output = io.StringIO()
     cut = 0  #  Index of cut to be added
     for i in range(nrow):
         idx = 0
         if np.floor(b_bar[i]) != b_bar[i]:
-            #print(f'Row {i+1} gives cut -> ', end = '')
+            print(f'Row {i+1} gives cut -> ', end = '', file=output)
             z = np.copy(prob.solution.advanced.binvarow(i)) # Use np.copy to avoid changing the
                                                         # optimal tableau in the problem instance
             rmatbeg[cut] = idx
@@ -144,13 +152,13 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
                     rmatval[idx] = z[j]
                     idx +=1
                 # Print the cut
-                #if z[j] > 0:
-                #    print('+', end = '')
+                if z[j] > 0:
+                    print('+', end = '',file=output)
                 if (z[j] != 0):
                         fj = fractions.Fraction(z[j])
                         fj = fj.limit_denominator()
                         num, den = (fj.numerator, fj.denominator)
-                #        print(f'{num}/{den} {varnames[j]} ', end='')
+                        print(f'{num}/{den} {varnames[j]} ', end='',file=output)
                 gc_lhs[i,:] = z
                 cuts[i].append(z[j])
             
@@ -159,9 +167,12 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
             gc_rhs_i = fractions.Fraction(gc_rhs[cut]).limit_denominator()
             num = gc_rhs_i.numerator
             den = gc_rhs_i.denominator
-            #print(f'>= {num}/{den}\n')
+            print(f'>= {num}/{den}',file=output)
             cut_limits.append(gc_rhs[cut])
             cut += 1
+    contents = output.getvalue()
+    output.close()
+    logging.info(contents)
     return cuts, cut_limits
 
 def determineOptimal(instance):
@@ -173,7 +184,7 @@ def determineOptimal(instance):
     cplexlog = name+".log"
     # Create an empty model
     mkp = Model(name)
-    mkp.set_log_output("solutions/"+cplexlog)
+    #mkp.set_log_output("solutions/"+cplexlog)
     # Define the decision variables
     x = mkp.binary_var_list(nCols, lb = 0, ub = 1, name = 'x')
     constraints = mkp.add_constraints(sum(A[i][j] * x[j] for j in nCols) <= b[i] for i in nRows)
@@ -196,4 +207,10 @@ def determineOptimal(instance):
  
     # Resolve the problem instance
     mkp.solve()
+    # Save output to Json file
+    json_string= mkp.solution.export_as_json_string()
+    file_path_json="solutions/"+name+"/optimal_sol.json"
+    with open(file_path_json, "w") as output_file:
+        json_ = json.dumps(json.loads(json_string), indent=4, sort_keys=True)
+        output_file.write(json_)
     return mkp.solution._objective, mkp.solution.get_values

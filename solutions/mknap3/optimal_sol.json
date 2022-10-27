@@ -1,0 +1,153 @@
+{
+    "CPLEXSolution": {
+        "header": {
+            "objectiveValue": "12400.0",
+            "problemName": "mknap3",
+            "solved_by": "cplex_local"
+        },
+        "linearConstraints": [
+            {
+                "index": 0,
+                "name": null,
+                "slack": 115.0
+            },
+            {
+                "index": 1,
+                "name": null,
+                "slack": 6.0
+            },
+            {
+                "index": 2,
+                "name": null,
+                "slack": 99.0
+            },
+            {
+                "index": 3,
+                "name": null,
+                "slack": 92.0
+            },
+            {
+                "index": 4,
+                "name": null,
+                "slack": 89.0
+            },
+            {
+                "index": 5,
+                "name": null,
+                "slack": 103.0
+            },
+            {
+                "index": 6,
+                "name": null,
+                "slack": 94.0
+            },
+            {
+                "index": 7,
+                "name": null,
+                "slack": 77.0
+            },
+            {
+                "index": 8,
+                "name": null,
+                "slack": 17.0
+            },
+            {
+                "index": 9,
+                "name": null
+            }
+        ],
+        "variables": [
+            {
+                "index": "0",
+                "name": "x_0",
+                "value": "1.0"
+            },
+            {
+                "index": "1",
+                "name": "x_1",
+                "value": "1.0"
+            },
+            {
+                "index": "2",
+                "name": "x_2",
+                "value": "1.0"
+            },
+            {
+                "index": "8",
+                "name": "x_8",
+                "value": "1.0"
+            },
+            {
+                "index": "13",
+                "name": "x_13",
+                "value": "1.0"
+            },
+            {
+                "index": "14",
+                "name": "x_14",
+                "value": "1.0"
+            },
+            {
+                "index": "15",
+                "name": "x_15",
+                "value": "1.0"
+            },
+            {
+                "index": "16",
+                "name": "x_16",
+                "value": "1.0"
+            },
+            {
+                "index": "17",
+                "name": "x_17",
+                "value": "1.0"
+            },
+            {
+                "index": "18",
+                "name": "x_18",
+                "value": "1.0"
+            },
+            {
+                "index": "19",
+                "name": "x_19",
+                "value": "1.0"
+            },
+            {
+                "index": "20",
+                "name": "x_20",
+                "value": "1.0"
+            },
+            {
+                "index": "21",
+                "name": "x_21",
+                "value": "1.0"
+            },
+            {
+                "index": "22",
+                "name": "x_22",
+                "value": "1.0"
+            },
+            {
+                "index": "24",
+                "name": "x_24",
+                "value": "1.0"
+            },
+            {
+                "index": "25",
+                "name": "x_25",
+                "value": "1.0"
+            },
+            {
+                "index": "26",
+                "name": "x_26",
+                "value": "1.0"
+            },
+            {
+                "index": "27",
+                "name": "x_27",
+                "value": "1.0"
+            }
+        ],
+        "version": "1.0"
+    }
+}

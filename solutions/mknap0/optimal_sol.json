@@ -1,0 +1,23 @@
+{
+    "CPLEXSolution": {
+        "header": {
+            "objectiveValue": "5.0",
+            "problemName": "mknap0",
+            "solved_by": "cplex_local"
+        },
+        "linearConstraints": [
+            {
+                "index": 0,
+                "name": null
+            }
+        ],
+        "variables": [
+            {
+                "index": "0",
+                "name": "x_0",
+                "value": "1.0"
+            }
+        ],
+        "version": "1.0"
+    }
+}

@@ -1,0 +1,212 @@
+{
+    "CPLEXSolution": {
+        "header": {
+            "objectiveValue": "16537.0",
+            "problemName": "mknap5",
+            "solved_by": "cplex_local"
+        },
+        "linearConstraints": [
+            {
+                "index": 0,
+                "name": null
+            },
+            {
+                "index": 1,
+                "name": null,
+                "slack": 11.0
+            },
+            {
+                "index": 2,
+                "name": null,
+                "slack": 1.0
+            },
+            {
+                "index": 3,
+                "name": null,
+                "slack": 78.0
+            },
+            {
+                "index": 4,
+                "name": null
+            }
+        ],
+        "variables": [
+            {
+                "index": "3",
+                "name": "x_3",
+                "value": "1.0"
+            },
+            {
+                "index": "5",
+                "name": "x_5",
+                "value": "1.0"
+            },
+            {
+                "index": "7",
+                "name": "x_7",
+                "value": "1.0"
+            },
+            {
+                "index": "8",
+                "name": "x_8",
+                "value": "1.0"
+            },
+            {
+                "index": "10",
+                "name": "x_10",
+                "value": "1.0"
+            },
+            {
+                "index": "11",
+                "name": "x_11",
+                "value": "1.0"
+            },
+            {
+                "index": "12",
+                "name": "x_12",
+                "value": "1.0"
+            },
+            {
+                "index": "14",
+                "name": "x_14",
+                "value": "1.0"
+            },
+            {
+                "index": "15",
+                "name": "x_15",
+                "value": "1.0"
+            },
+            {
+                "index": "16",
+                "name": "x_16",
+                "value": "1.0"
+            },
+            {
+                "index": "18",
+                "name": "x_18",
+                "value": "1.0"
+            },
+            {
+                "index": "19",
+                "name": "x_19",
+                "value": "1.0"
+            },
+            {
+                "index": "22",
+                "name": "x_22",
+                "value": "1.0"
+            },
+            {
+                "index": "24",
+                "name": "x_24",
+                "value": "1.0"
+            },
+            {
+                "index": "25",
+                "name": "x_25",
+                "value": "1.0"
+            },
+            {
+                "index": "26",
+                "name": "x_26",
+                "value": "1.0"
+            },
+            {
+                "index": "27",
+                "name": "x_27",
+                "value": "1.0"
+            },
+            {
+                "index": "28",
+                "name": "x_28",
+                "value": "1.0"
+            },
+            {
+                "index": "30",
+                "name": "x_30",
+                "value": "1.0"
+            },
+            {
+                "index": "31",
+                "name": "x_31",
+                "value": "1.0"
+            },
+            {
+                "index": "33",
+                "name": "x_33",
+                "value": "1.0"
+            },
+            {
+                "index": "34",
+                "name": "x_34",
+                "value": "1.0"
+            },
+            {
+                "index": "35",
+                "name": "x_35",
+                "value": "1.0"
+            },
+            {
+                "index": "36",
+                "name": "x_36",
+                "value": "1.0"
+            },
+            {
+                "index": "37",
+                "name": "x_37",
+                "value": "1.0"
+            },
+            {
+                "index": "38",
+                "name": "x_38",
+                "value": "1.0"
+            },
+            {
+                "index": "39",
+                "name": "x_39",
+                "value": "1.0"
+            },
+            {
+                "index": "40",
+                "name": "x_40",
+                "value": "1.0"
+            },
+            {
+                "index": "41",
+                "name": "x_41",
+                "value": "1.0"
+            },
+            {
+                "index": "42",
+                "name": "x_42",
+                "value": "1.0"
+            },
+            {
+                "index": "43",
+                "name": "x_43",
+                "value": "1.0"
+            },
+            {
+                "index": "46",
+                "name": "x_46",
+                "value": "1.0"
+            },
+            {
+                "index": "47",
+                "name": "x_47",
+                "value": "1.0"
+            },
+            {
+                "index": "48",
+                "name": "x_48",
+                "value": "1.0"
+            },
+            {
+                "index": "49",
+                "name": "x_49",
+                "value": "1.0"
+            }
+        ],
+        "version": "1.0"
+    }
+}
