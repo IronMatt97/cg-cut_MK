@@ -3,7 +3,6 @@ import sys
 import os
 from internals.solver import *
 from internals.utils import *
-
 import logging
 
 logging.basicConfig(filename='log.txt', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')

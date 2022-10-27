@@ -122,7 +122,7 @@ def print_final_tableau(prob):
     logging.info("Cuts to generate: %d", n_cuts)
     return n_cuts , b_bar
 
-def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) : 
+def generate_fract_gc(n_cuts,ncol, nrow, prob, varnames, b_bar) : 
     cuts = []
     cut_limits= []
     gc_sense = [''] * n_cuts
@@ -172,6 +172,32 @@ def generate_gomory_cuts(n_cuts,ncol, nrow, prob, varnames, b_bar) :
             logging.info(contents)
    
     return cuts, cut_limits
+def get_cuts(prob, cut_row, cut_rhs, A, ncol):
+    cut_row = np.append(cut_row, cut_rhs)
+    b = np.array(prob.linear_constraints.get_rhs())
+    A = np.append(A, b.reshape(-1, 1), axis=1)
+    plotted_vars = np.nonzero(prob.objective.get_linear())[0]
+    # Assumption: plotted variables are at the beginning of the initial tableau
+    for i, sk in enumerate(range(len(plotted_vars), ncol)):
+        cut_coef = cut_row[sk]
+        cut_row -= A[i,:] * cut_coef
+    lhs = cut_row[:len(plotted_vars)]
+    rhs = cut_row[ncol:]
+    return lhs, rhs
+
+def generate_int_gc(ncol, prob, varnames, A,b,cuts) : 
+
+    for i, gc in enumerate(cuts):
+        lhs, rhs = get_cuts(prob, cuts[i], b[i], A,ncol)
+  
+    # Print the cut
+    for j in range(len(lhs)):
+        if -lhs[j] > 0:
+            print('+', end = '')
+        if (-lhs[j] != 0):
+            print(f'{-lhs[j]} {varnames[j]} ', end='')
+    print(f'<= {-rhs[0]}\n', end='')
+       
 
 def determineOptimal(instance):
     c, A, b = MKPpopulate(instance) 

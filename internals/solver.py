@@ -78,6 +78,8 @@ def solveCplex(instance) :
         params = mkp.parameters
         # Disable presolve 
         params.preprocessing.presolve.set(0) 
+        params.preprocessing.linear.set(0)
+        params.preprocessing.reduce.set(0)
         # Register Callback 
         timelim_cb = mkp.register_callback(TimeLimitCallback)
         # Set time limit
@@ -114,11 +116,17 @@ def solveCplex(instance) :
 
         # Generate gormory cuts
         n_cuts, b_bar = print_final_tableau(mkp)
-        cuts, cut_limits = generate_gomory_cuts(n_cuts, nCols, nRows, mkp, names,b_bar)
+        cuts, cut_limits = generate_fract_gc(n_cuts, nCols, nRows, mkp, names,b_bar)
+        #cuts, cut_limits = generate_int_gc(n_cuts, nCols, nRows, mkp, names,b_bar)
 
         # Add the cuts sequentially and solve the problem
         for i in range(len(cuts)):
-            mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= cuts[i])], rhs= [cut_limits[i]], names = ["cut_"+str(i+1)], senses = [constraint_senses[i]])
+            mkp.linear_constraints.advanced.add_user_cuts(
+                lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= cuts[i])], 
+                senses= [constraint_senses[i]], 
+                rhs= [cut_limits[i]],
+                names = ["cut_"+str(i+1)])
+            #mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= cuts[i])], rhs= [cut_limits[i]], names = ["cut_"+str(i+1)], senses = [constraint_senses[i]])
             all_constraints.append(cuts[i])
             mkp.set_problem_name(name+"_cut_n"+str(i+1))
             logging.info("SOLUTION OF "+name+" WITH "+str(i+1)+" GOMORY CUTS APPLIED")

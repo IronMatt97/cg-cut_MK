@@ -21,12 +21,11 @@
    maxDualResidual="0"
    maxX="0.5"
    maxPi="1.5"
-   maxSlack="0.5"
+   maxSlack="0"
    maxRedCost="2.5"
-   kappa="10"/>
+   kappa="1.0000000000000002"/>
  <linearConstraints>
   <constraint name="c0" index="0" status="LL" slack="0" dual="1.5"/>
-  <constraint name="cut_1" index="1" status="BS" slack="0.5" dual="-0"/>
  </linearConstraints>
  <variables>
   <variable name="x0" index="0" status="LL" value="0" reducedCost="-2.5"/>
