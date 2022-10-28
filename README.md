@@ -1,5 +1,5 @@
 # Multidimensional knapsack problem using Gomory Cuts' algorithm
-### A simple CPLEX python code for solving the Multidimensional knapsack problem
+### A simple CPLEX Python code for solving the Multidimensional knapsack problem
 The problem is described below:
 http://people.brunel.ac.uk/~mastjjb/jeb/orlib/mknapinfo.html
 

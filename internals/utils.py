@@ -1,34 +1,32 @@
-from cmath import log
-from distutils.archive_util import make_zipfile
-from docplex.mp.model import Model
+from cplex.callbacks import MIPInfoCallback
 from typing import Tuple
 import numpy as np
 import fractions
-from cplex._internal._subinterfaces import CutType
-import matplotlib.pyplot as plt
-from scipy.spatial import ConvexHull
-import json as json
 import logging
-import io
 import cplex
+import io
 
-logging.basicConfig(filename='log.txt', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
-        
-def MKPpopulate(name: str) -> Tuple:
-    '''
-    This function extracts the raw data from a .txt file and populates the objective function coefficients
-    array, the constraints coefficients matrix A and the right hand side b array
-    
-    Arguments:
-        name -- the name of the .txt file that contains the raw data
-        
-    returns:
-        c -- objective function coefficients array (shape = 1 * n)
-        A -- constraints coefficients matrix A (shape = m * n)
-        b -- right hand side values (shape = 1 * m)
-    '''
-    
-    # Opening .txt file in order to read the raw data of an instance
+
+logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
+
+class TimeLimitCallback(MIPInfoCallback):
+    def __call__(self):
+        if not self.aborted and self.has_incumbent():
+            gap = 100.0 * self.get_MIP_relative_gap()
+            timeused = self.get_time() - self.starttime
+            if timeused > self.timelimit:
+                logging.info("Good enough solution at", timeused, "sec., gap =",
+                      gap, "%, quitting.")
+                self.aborted = True
+                self.abort()
+
+def flushLog(logName):
+    with open(logName,'w') as file:
+        pass
+
+# Function to extract A, b and c (constraint coefficients matrix, right hand side array and objective function coefficients array)
+def getProblemData(name: str) -> Tuple:
+    # Opening .txt file in order to read the raw data of a problem instance
     file = open(str(name), 'r')
     x = []
     for line in file:
@@ -43,23 +41,20 @@ def MKPpopulate(name: str) -> Tuple:
 
     # Populating Objective Function Coefficients
     c = np.array([float(x.pop(0)) for i in range(NumColumns)])
-    
     assert type(c) == np.ndarray
     assert len(c)  == NumColumns
     
     # Populating A matrix (size NumRows * NumColumns)
     ConstCoef = np.array([float(x.pop(0)) for i in range(int(NumRows * NumColumns))])    
-    
     assert type(ConstCoef) == np.ndarray
     assert len(ConstCoef)  == int(NumRows*NumColumns)
     
-    A = np.reshape(ConstCoef, (NumRows, NumColumns)) # reshaping the 1-d ConstCoef into A
-    
+    # reshaping the 1-d ConstCoef into A
+    A = np.reshape(ConstCoef, (NumRows, NumColumns)) 
     assert A.shape == (NumRows, NumColumns)
     
     # Populating the RHS
     b = np.array([float(x.pop(0)) for i in range(int(NumRows))])
-
     assert len(b) == NumRows
     assert type(b) == np.ndarray
 
@@ -69,17 +64,18 @@ def print_solution(prob):
     ncol = len(prob.variables.get_cols())
     nrow = len(prob.linear_constraints.get_rows())
     varnames = prob.variables.get_names()
-    logging.info('                  -> Solution status = %s ' ,prob.solution.status[prob.solution.get_status()])
-    logging.info('                  -> Solution value  = %f', prob.solution.get_objective_value())
     slack = np.round(prob.solution.get_linear_slacks(), 3)
-    x     = np.round(prob.solution.get_values(), 3)
-    logging.info("                  -> Variables solution: %s",x)
+    x = np.round(prob.solution.get_values(), 3)
+
+    # Log everything about the solutions found
+    logging.info("\t-> Solution status = %s", prob.solution.status[prob.solution.get_status()])
+    logging.info("\t-> Solution value  = %f\n", prob.solution.get_objective_value())
+    logging.info("SLACKS SITUATION:")
     for i in range(nrow):
-        logging.info(f'                  -> Row {i}:  Slack = {slack[i]}')
+        logging.info(f'-> Row {i}:  Slack = {slack[i]}')
+    logging.info("\n\t\t\t\t\t PROBLEM VARIABLES:")
     for j in range(ncol):
-        logging.info(f'                  -> Column {j} (variable {varnames[j]}):  Value = {x[j]}')
-
-
+        logging.info(f'-> Column {j} (variable {varnames[j]}):  Value = {x[j]}')
 
 def get_tableau(prob):
     BinvA = np.array(prob.solution.advanced.binvarow())
@@ -93,7 +89,7 @@ def get_tableau(prob):
     b_bar = np.matmul(Binv, b)
     idx = 0     # Compute the nonzeros
     n_cuts = 0  # Number of fractional variables (cuts to be generated)
-    logging.info('Simplex tableau of the linear programming relaxation')
+    logging.info('\n\t\t\t\t\t LP relaxation final tableau:\n')
     for i in range(nrow):
         output_t = io.StringIO()
         z = prob.solution.advanced.binvarow(i)
@@ -123,7 +119,7 @@ def get_tableau(prob):
     logging.info("Cuts to generate: %d", n_cuts)
     return n_cuts , b_bar
 
-def generate_fract_gc(n_cuts,ncol, nrow, prob, varnames, b_bar) : 
+def initialize_fract_gc(n_cuts,ncol, nrow, prob, varnames, b_bar) : 
     cuts = []
     cut_limits= []
     gc_sense = [''] * n_cuts
@@ -132,7 +128,7 @@ def generate_fract_gc(n_cuts,ncol, nrow, prob, varnames, b_bar) :
     rmatbeg  = np.zeros(n_cuts)
     rmatind  = np.zeros(ncol)
     rmatval  = np.zeros(ncol)
-    logging.info('Generating Gomory cuts:...')
+    logging.info('Generating Gomory cuts...\n')
     cut = 0  #  Index of cut to be added
     for i in range(nrow):
         idx = 0
@@ -175,7 +171,7 @@ def generate_fract_gc(n_cuts,ncol, nrow, prob, varnames, b_bar) :
     return gc_lhs, gc_rhs
 
 def generate_gc(mkp, A, gc_lhs, gc_rhs, names) : 
-    logging.info('\nGenerate final Gomory cuts:')
+    logging.info('*** GOMORY CUTS ***\n')
     cuts = []
     cuts_limits = []
     cut_senses = []
@@ -216,7 +212,7 @@ def get_lhs_rhs(prob, cut_row, cut_rhs, A):
     return lhs, rhs
 
 def determineOptimal(instance):
-    c, A, b = MKPpopulate(instance) 
+    c, A, b = getProblemData(instance) 
     nCols, nRows = (len(c), len(b))
     # Get the instance name
     txtname = instance.split("/")[1]    
@@ -234,7 +230,7 @@ def determineOptimal(instance):
     for i in range(nRows):
         constraint_names.append("c"+str(i))
         constraint_senses.append("L")
-    with cplex.Cplex() as mkp,  open("cplex_log.txt", "w") as f:
+    with cplex.Cplex() as mkp,  open("optimalResolution.log", "w") as f:
         mkp.set_problem_name(name)
         mkp.objective.set_sense(mkp.objective.sense.maximize)
         mkp.set_log_stream(f)
@@ -256,7 +252,7 @@ def determineOptimal(instance):
         # Resolve the problem instance
         mkp.solve()
         # Report the results 
-        logging.info("OPTIMAL PLI SOLUTION ")
+        logging.info("\n\t\t\t\t\t\t*** OPTIMAL PLI SOLUTION ***")
         print_solution(mkp)
         mkp.write("lp/"+name+"/optimal.lp")
         mkp.solution.write("solutions/"+name+"/optimal.log")
