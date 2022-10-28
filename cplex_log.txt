@@ -6,63 +6,25 @@ CPXPARAM_Preprocessing_Linear                    0
 Legacy callback                                  i
 
 Iteration log . . .
-Iteration:     1   Dual objective     =          9378.050000
+Iteration:     1   Dual objective     =             7.142857
 Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
 CPXPARAM_Preprocessing_Presolve                  0
 CPXPARAM_Read_DataCheck                          1
 CPXPARAM_Preprocessing_Reduce                    0
 CPXPARAM_Preprocessing_Linear                    0
 Legacy callback                                  i
-Using devex.
+
+Iteration log . . .
+Iteration:     1   Dual objective     =             6.463023
 Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
 CPXPARAM_Preprocessing_Presolve                  0
 CPXPARAM_Read_DataCheck                          1
 CPXPARAM_Preprocessing_Reduce                    0
 CPXPARAM_Preprocessing_Linear                    0
 Legacy callback                                  i
-Using devex.
-Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
-CPXPARAM_Preprocessing_Presolve                  0
-CPXPARAM_Read_DataCheck                          1
-CPXPARAM_Preprocessing_Reduce                    0
-CPXPARAM_Preprocessing_Linear                    0
-Legacy callback                                  i
-Using devex.
-Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
-CPXPARAM_Preprocessing_Presolve                  0
-CPXPARAM_Read_DataCheck                          1
-CPXPARAM_Preprocessing_Reduce                    0
-CPXPARAM_Preprocessing_Linear                    0
-Legacy callback                                  i
-Using devex.
-Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
-CPXPARAM_Preprocessing_Presolve                  0
-CPXPARAM_Read_DataCheck                          1
-CPXPARAM_Preprocessing_Reduce                    0
-CPXPARAM_Preprocessing_Linear                    0
-Legacy callback                                  i
-Using devex.
-Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
-CPXPARAM_Preprocessing_Presolve                  0
-CPXPARAM_Read_DataCheck                          1
-CPXPARAM_Preprocessing_Reduce                    0
-CPXPARAM_Preprocessing_Linear                    0
-Legacy callback                                  i
-Using devex.
-Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
-CPXPARAM_Preprocessing_Presolve                  0
-CPXPARAM_Read_DataCheck                          1
-CPXPARAM_Preprocessing_Reduce                    0
-CPXPARAM_Preprocessing_Linear                    0
-Legacy callback                                  i
-Using devex.
-Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
-CPXPARAM_Preprocessing_Presolve                  0
-CPXPARAM_Read_DataCheck                          1
-CPXPARAM_Preprocessing_Reduce                    0
-CPXPARAM_Preprocessing_Linear                    0
-Legacy callback                                  i
-Using devex.
+
+Iteration log . . .
+Iteration:     1   Dual objective     =             6.118421
 Version identifier: 22.1.0.0 | 2022-03-09 | 1a383f8ce
 CPXPARAM_Preprocessing_Presolve                  0
 CPXPARAM_Read_DataCheck                          1

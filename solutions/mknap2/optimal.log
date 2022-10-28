@@ -1,0 +1,57 @@
+<?xml version = "1.0" encoding="UTF-8" standalone="yes"?>
+<CPLEXSolution version="1.2">
+ <header
+   problemName="mknap2"
+   solutionName="incumbent"
+   solutionIndex="-1"
+   objectiveValue="4015"
+   solutionTypeValue="3"
+   solutionTypeString="primal"
+   solutionStatusValue="101"
+   solutionStatusString="integer optimal solution"
+   solutionMethodString="mip"
+   primalFeasible="1"
+   dualFeasible="1"
+   MIPNodes="0"
+   MIPIterations="51"
+   writeLevel="1"/>
+ <quality
+   epInt="1.0000000000000001e-05"
+   epRHS="9.9999999999999995e-07"
+   maxIntInfeas="0"
+   maxPrimalInfeas="0"
+   maxX="1"
+   maxSlack="71"/>
+ <linearConstraints>
+  <constraint name="c0" index="0" slack="35"/>
+  <constraint name="c1" index="1" slack="35"/>
+  <constraint name="c2" index="2" slack="12"/>
+  <constraint name="c3" index="3" slack="33"/>
+  <constraint name="c4" index="4" slack="53"/>
+  <constraint name="c5" index="5" slack="71"/>
+  <constraint name="c6" index="6" slack="4"/>
+  <constraint name="c7" index="7" slack="4"/>
+  <constraint name="c8" index="8" slack="19"/>
+  <constraint name="c9" index="9" slack="13"/>
+ </linearConstraints>
+ <variables>
+  <variable name="x0" index="0" value="1"/>
+  <variable name="x1" index="1" value="1"/>
+  <variable name="x2" index="2" value="0"/>
+  <variable name="x3" index="3" value="1"/>
+  <variable name="x4" index="4" value="0"/>
+  <variable name="x5" index="5" value="1"/>
+  <variable name="x6" index="6" value="1"/>
+  <variable name="x7" index="7" value="0"/>
+  <variable name="x8" index="8" value="1"/>
+  <variable name="x9" index="9" value="1"/>
+  <variable name="x10" index="10" value="0"/>
+  <variable name="x11" index="11" value="0"/>
+  <variable name="x12" index="12" value="0"/>
+  <variable name="x13" index="13" value="1"/>
+  <variable name="x14" index="14" value="1"/>
+ </variables>
+ <objectiveValues>
+  <objective index="0" name="" value="4015"/>
+ </objectiveValues>
+</CPLEXSolution>

@@ -1,0 +1,47 @@
+<?xml version = "1.0" encoding="UTF-8" standalone="yes"?>
+<CPLEXSolution version="1.2">
+ <header
+   problemName="mknap7_cut_n1"
+   objectiveValue="6.4630225080385824"
+   solutionTypeValue="1"
+   solutionTypeString="basic"
+   solutionStatusValue="1"
+   solutionStatusString="optimal"
+   solutionMethodString="dual"
+   primalFeasible="1"
+   dualFeasible="1"
+   simplexIterations="1"
+   writeLevel="1"/>
+ <quality
+   epRHS="9.9999999999999995e-07"
+   epOpt="9.9999999999999995e-07"
+   maxPrimalInfeas="0"
+   maxDualInfeas="0"
+   maxPrimalResidual="7.1054273576010019e-15"
+   maxDualResidual="4.8849813083506888e-15"
+   maxX="0.59485530546623711"
+   maxPi="0.58199356913183287"
+   maxSlack="29.726688102893892"
+   maxRedCost="1.0289389067524009"
+   kappa="94.10491565384531"/>
+ <linearConstraints>
+  <constraint name="c0" index="0" status="BS" slack="6.9421221864951805" dual="-0"/>
+  <constraint name="c1" index="1" status="LL" slack="0" dual="0.58199356913183287"/>
+  <constraint name="c2" index="2" status="BS" slack="0.94212218649517254" dual="-0"/>
+  <constraint name="c3" index="3" status="BS" slack="29.726688102893892" dual="-0"/>
+  <constraint name="cut_1" index="4" status="LL" slack="0" dual="0.025723472668810143"/>
+ </linearConstraints>
+ <variables>
+  <variable name="x0" index="0" status="BS" value="0.57877813504823172" reducedCost="0"/>
+  <variable name="x1" index="1" status="LL" value="0" reducedCost="-0.73311897106109336"/>
+  <variable name="x2" index="2" status="BS" value="0.59485530546623711" reducedCost="0"/>
+  <variable name="x3" index="3" status="LL" value="0" reducedCost="-1.0289389067524009"/>
+  <variable name="s0" index="4" status="LL" value="0" reducedCost="0"/>
+  <variable name="s1" index="5" status="LL" value="0" reducedCost="-0.58199356913183287"/>
+  <variable name="s2" index="6" status="LL" value="0" reducedCost="0"/>
+  <variable name="s3" index="7" status="LL" value="0" reducedCost="0"/>
+ </variables>
+ <objectiveValues>
+  <objective index="0" name="" value="6.4630225080385815"/>
+ </objectiveValues>
+</CPLEXSolution>
