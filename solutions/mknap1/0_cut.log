@@ -47,6 +47,16 @@
   <variable name="x7" index="7" status="UL" value="1" reducedCost="1510.0668435013265"/>
   <variable name="x8" index="8" status="LL" value="0" reducedCost="-781.98732095490709"/>
   <variable name="x9" index="9" status="LL" value="0" reducedCost="-216.63511936339521"/>
+  <variable name="s0" index="10" status="LL" value="0" reducedCost="0"/>
+  <variable name="s1" index="11" status="LL" value="0" reducedCost="-11.385145888594163"/>
+  <variable name="s2" index="12" status="LL" value="0" reducedCost="-5.8040318302387277"/>
+  <variable name="s3" index="13" status="LL" value="0" reducedCost="0"/>
+  <variable name="s4" index="14" status="LL" value="0" reducedCost="0"/>
+  <variable name="s5" index="15" status="LL" value="0" reducedCost="0"/>
+  <variable name="s6" index="16" status="LL" value="0" reducedCost="0"/>
+  <variable name="s7" index="17" status="LL" value="0" reducedCost="0"/>
+  <variable name="s8" index="18" status="LL" value="0" reducedCost="0"/>
+  <variable name="s9" index="19" status="LL" value="0" reducedCost="-0.37161803713527825"/>
  </variables>
  <objectiveValues>
   <objective index="0" name="" value="9297.7124668435008"/>

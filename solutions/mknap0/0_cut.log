@@ -30,6 +30,7 @@
  <variables>
   <variable name="x0" index="0" status="LL" value="0" reducedCost="-2.5"/>
   <variable name="x1" index="1" status="BS" value="0.5" reducedCost="0"/>
+  <variable name="s0" index="2" status="LL" value="0" reducedCost="-1.5"/>
  </variables>
  <objectiveValues>
   <objective index="0" name="" value="7.5"/>

@@ -38,7 +38,6 @@ def solveCplex(instance) :
     path_base_lp = str("lp/"+name)
 
     #Program variables section ####################################################
-
     names = []
     all_constraints = []
     lower_bounds = []
@@ -46,27 +45,32 @@ def solveCplex(instance) :
     constraint_names = []
     constraint_senses = []
 
+    # Variables 
     for i in range(nCols):
         names.append("x"+str(i))
         lower_bounds.append(0.0)
         upper_bounds.append(1.0)
-
+    # Constraint 
     for i in range(nRows):
         constraint_names.append("c"+str(i))
         constraint_senses.append("L")
 
     logging.info("...Checking input coherency")
-    assert(len(c)==len(lower_bounds))
-    assert(len(c)==len(upper_bounds))
-    assert(len(c)==len(names))
+    assert(len(c)==nCols)
+    logging.info("names %s",names)
     logging.info("... Done.")
+
+    # Slack 
+    for i in range(nRows):
+        names.append("s"+str(i))
+        lower_bounds.append(0.0)
+
+    nCols= nCols+nRows
     
     # Solver section    ############################################################
 
     #First of all determine the optimal solution
-    optimal_value,vars = determineOptimal(instance)
-    logging.info("OPTIMAL PLI SOLUTION IS %f",optimal_value)
-    #logging.info("Variables: %s",vars)
+    determineOptimal(instance)
 
     with cplex.Cplex() as mkp,  open("cplex_log.txt", "w") as f:
         mkp.set_problem_name(name)
@@ -85,19 +89,30 @@ def solveCplex(instance) :
         # Set time limit
         timelim_cb.timelimit = 60*3  #3 min max
         timelim_cb.aborted = False
-        # Add variables --------------------------------------------------------------------
-        mkp.variables.add(names= ["x"+str(i) for i in range(nCols)])
-    
-        for i in range(nCols):
+        # Add variables & Slack --------------------------------------------------------------------
+        mkp.variables.add(names=names)
+        # Add variables 
+        for i in range(nCols-nRows):
             mkp.variables.set_lower_bounds(i, lower_bounds[i])
             mkp.variables.set_upper_bounds(i, upper_bounds[i])
-
-        # Add contraints -------------------------------------------------------------------
+        # Add slack
+        for i in range(nCols-nRows,nCols):
+            mkp.variables.set_lower_bounds(i, lower_bounds[i])
+        
+        #Add slack to constraints
+        A = A.tolist()
+        for row in range(nRows) :
+            for slack in range(nRows) : 
+                if row==slack : 
+                    A[row].append(1)
+                else :
+                    A[row].append(0)
+        # Add contraints to Cplex ------------------------------------------------------------------
         for i in range(nRows):
             mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])], rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
             all_constraints.append(A[i])
         # Add objective function -----------------------------------------------------------
-        for i in range(nCols): 
+        for i in range(nCols-nRows): 
             mkp.objective.set_linear([(i, c[i])])
     
         # Start time 
@@ -112,21 +127,19 @@ def solveCplex(instance) :
         print_solution(mkp)
         mkp.write(path_base_lp+"/0_cut.lp")
         mkp.solution.write(path_base_log+"/0_cut.log")
-        
 
         # Generate gormory cuts
-        n_cuts, b_bar = print_final_tableau(mkp)
-        cuts, cut_limits = generate_fract_gc(n_cuts, nCols, nRows, mkp, names,b_bar)
-        #cuts, cut_limits = generate_int_gc(n_cuts, nCols, nRows, mkp, names,b_bar)
+        n_cuts, b_bar = get_tableau(mkp)
+        gc_lhs, gc_rhs = generate_fract_gc(n_cuts, nCols, nRows, mkp, names,b_bar)
+        cuts, cut_limits, cut_senses=generate_gc(mkp, A, gc_lhs, gc_rhs, names)
 
-        # Add the cuts sequentially and solve the problem
+        # Add the cuts sequentially and solve the problem (without slack variables)
         for i in range(len(cuts)):
-            mkp.linear_constraints.advanced.add_user_cuts(
-                lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= cuts[i])], 
-                senses= [constraint_senses[i]], 
+            mkp.linear_constraints.add(
+                lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols-nRows)], val= cuts[i])], 
+                senses= [cut_senses[i]], 
                 rhs= [cut_limits[i]],
                 names = ["cut_"+str(i+1)])
-            #mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= cuts[i])], rhs= [cut_limits[i]], names = ["cut_"+str(i+1)], senses = [constraint_senses[i]])
             all_constraints.append(cuts[i])
             mkp.set_problem_name(name+"_cut_n"+str(i+1))
             logging.info("SOLUTION OF "+name+" WITH "+str(i+1)+" GOMORY CUTS APPLIED")

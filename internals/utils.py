@@ -10,6 +10,7 @@ from scipy.spatial import ConvexHull
 import json as json
 import logging
 import io
+import cplex
 
 logging.basicConfig(filename='log.txt', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
         
@@ -80,7 +81,7 @@ def print_solution(prob):
 
 
 
-def print_final_tableau(prob):
+def get_tableau(prob):
     BinvA = np.array(prob.solution.advanced.binvarow())
 
     nrow = BinvA.shape[0]
@@ -92,7 +93,7 @@ def print_final_tableau(prob):
     b_bar = np.matmul(Binv, b)
     idx = 0     # Compute the nonzeros
     n_cuts = 0  # Number of fractional variables (cuts to be generated)
-    logging.info('Final tableau')
+    logging.info('Simplex tableau of the linear programming relaxation')
     for i in range(nrow):
         output_t = io.StringIO()
         z = prob.solution.advanced.binvarow(i)
@@ -171,8 +172,37 @@ def generate_fract_gc(n_cuts,ncol, nrow, prob, varnames, b_bar) :
             output.close()
             logging.info(contents)
    
-    return cuts, cut_limits
-def get_cuts(prob, cut_row, cut_rhs, A, ncol):
+    return gc_lhs, gc_rhs
+
+def generate_gc(mkp, A, gc_lhs, gc_rhs, names) : 
+    logging.info('\nGenerate final Gomory cuts:')
+    cuts = []
+    cuts_limits = []
+    cut_senses = []
+    for i, gc in enumerate(gc_lhs):
+        output = io.StringIO()
+        cuts.append([])
+        lhs, rhs = get_lhs_rhs(mkp, gc_lhs[i], gc_rhs[i], A)
+        # Print the cut
+        for j in range(len(lhs)):
+            if -lhs[j] > 0:
+                print('+', end = '',file=output)
+            if (-lhs[j] != 0):
+                print(f'{-lhs[j]} {names[j]} ', end='',file=output)
+                cuts[i].append(-lhs[j])
+            if (-lhs[j] == 0):
+                print(f'{-lhs[j]} {names[j]} ', end='',file=output)
+                cuts[i].append(0)
+        print(f'<= {-rhs[0]}\n', end='',file=output)
+        cuts_limits.append(-rhs[0])
+        cut_senses.append('L')
+        contents = output.getvalue()
+        output.close()
+        logging.info(contents)
+    return cuts, cuts_limits, cut_senses
+
+def get_lhs_rhs(prob, cut_row, cut_rhs, A):
+    ncol = len(A[0])
     cut_row = np.append(cut_row, cut_rhs)
     b = np.array(prob.linear_constraints.get_rhs())
     A = np.append(A, b.reshape(-1, 1), axis=1)
@@ -185,57 +215,48 @@ def get_cuts(prob, cut_row, cut_rhs, A, ncol):
     rhs = cut_row[ncol:]
     return lhs, rhs
 
-def generate_int_gc(ncol, prob, varnames, A,b,cuts) : 
-
-    for i, gc in enumerate(cuts):
-        lhs, rhs = get_cuts(prob, cuts[i], b[i], A,ncol)
-  
-    # Print the cut
-    for j in range(len(lhs)):
-        if -lhs[j] > 0:
-            print('+', end = '')
-        if (-lhs[j] != 0):
-            print(f'{-lhs[j]} {varnames[j]} ', end='')
-    print(f'<= {-rhs[0]}\n', end='')
-       
-
 def determineOptimal(instance):
     c, A, b = MKPpopulate(instance) 
-    nCols, nRows = range(len(c)), range(len(b))
+    nCols, nRows = (len(c), len(b))
     # Get the instance name
     txtname = instance.split("/")[1]    
     name = txtname.split(".txt")[0]
     cplexlog = name+".log"
-    # Create an empty model
-    mkp = Model(name)
-    #mkp.set_log_output("solutions/"+cplexlog)
-    # Define the decision variables
-    x = mkp.binary_var_list(nCols, lb = 0, ub = 1, name = 'x')
-    constraints = mkp.add_constraints(sum(A[i][j] * x[j] for j in nCols) <= b[i] for i in nRows)
-    profit = mkp.sum(c[j] * x[j] for j in nCols)
-    mkp.add_kpi(profit, 'profit')
-    objective = mkp.maximize(profit)
-    # Parameters Tweak 
-    params = mkp.parameters
-    params.threads = 1
-    params.mip.strategy.heuristicfreq = -1
-    params.mip.cuts.mircut = -1
-    params.mip.cuts.implied = -1
-    #params.mip.cuts.gomory = -1  # We only want Gomory cuts to be done 
-    params.mip.cuts.flowcovers = -1
-    params.mip.cuts.pathcut = -1
-    params.mip.cuts.liftproj = -1
-    params.mip.cuts.zerohalfcut = -1
-    params.mip.cuts.cliques = -1
-    params.mip.cuts.covers = -1
- 
-    # Resolve the problem instance
-    mkp.solve()
-    # Save output to Json file
-    json_string= mkp.solution.export_as_json_string()
-    file_path_json="solutions/"+name+"/optimal_sol.json"
-    with open(file_path_json, "w") as output_file:
-        json_ = json.dumps(json.loads(json_string), indent=4, sort_keys=True)
-        output_file.write(json_)
-    mkp.export_as_lp("lp/"+name+"/optimal_sol.lp")
-    return mkp.solution._objective, mkp.solution.get_values
+    #Program variables section ####################################################
+    names = []
+    all_constraints = []
+    constraint_names = []
+    constraint_senses = []
+    # Variables 
+    for i in range(nCols):
+        names.append("x"+str(i))
+    # Constraint 
+    for i in range(nRows):
+        constraint_names.append("c"+str(i))
+        constraint_senses.append("L")
+    with cplex.Cplex() as mkp,  open("cplex_log.txt", "w") as f:
+        mkp.set_problem_name(name)
+        mkp.objective.set_sense(mkp.objective.sense.maximize)
+        mkp.set_log_stream(f)
+        mkp.set_error_stream(f)
+        mkp.set_warning_stream(f)
+        mkp.set_results_stream(f)
+        params = mkp.parameters
+        # Disable presolve 
+        params.preprocessing.presolve.set(0) 
+        # Add variables & Slack --------------------------------------------------------------------
+        mkp.variables.add(names=names, types=[mkp.variables.type.binary] * nCols)
+        # Add contraints -------------------------------------------------------------------
+        for i in range(nRows):
+            mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])], rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
+            all_constraints.append(A[i])
+        # Add objective function -----------------------------------------------------------
+        for i in range(nCols): 
+            mkp.objective.set_linear([(i, c[i])])
+        # Resolve the problem instance
+        mkp.solve()
+        # Report the results 
+        logging.info("OPTIMAL PLI SOLUTION ")
+        print_solution(mkp)
+        mkp.write("lp/"+name+"/optimal.lp")
+        mkp.solution.write("solutions/"+name+"/optimal.log")
