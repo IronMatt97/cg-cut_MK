@@ -1,29 +1,14 @@
-from numpy import outer
 from internals.utils import *
-from time import *
-from cplex.callbacks import MIPInfoCallback
-import cplex
-import matplotlib.pyplot as plt
-import os
 import logging
+import cplex
+import os
 
-logging.basicConfig(filename='log.txt', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
-
-class TimeLimitCallback(MIPInfoCallback):
-    def __call__(self):
-        if not self.aborted and self.has_incumbent():
-            gap = 100.0 * self.get_MIP_relative_gap()
-            timeused = self.get_time() - self.starttime
-            if timeused > self.timelimit:
-                logging.info("Good enough solution at", timeused, "sec., gap =",
-                      gap, "%, quitting.")
-                self.aborted = True
-                self.abort()
+logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
 
 # This function solves a specific problem instance
-def solveCplex(instance) :
+def solveProblem(instance) :
     # Retrieve the matrixes of the problem instance
-    c, A, b = MKPpopulate(instance) 
+    c, A, b = getProblemData(instance) 
     nCols, nRows =(len(c)), (len(b))
     
     # Get the instance name
@@ -57,7 +42,6 @@ def solveCplex(instance) :
 
     logging.info("...Checking input coherency")
     assert(len(c)==nCols)
-    logging.info("names %s",names)
     logging.info("... Done.")
 
     # Slack 
@@ -72,7 +56,7 @@ def solveCplex(instance) :
     #First of all determine the optimal solution
     determineOptimal(instance)
 
-    with cplex.Cplex() as mkp,  open("cplex_log.txt", "w") as f:
+    with cplex.Cplex() as mkp,  open("cplexEvents.log", "w") as f:
         mkp.set_problem_name(name)
         mkp.objective.set_sense(mkp.objective.sense.maximize)
         mkp.set_log_stream(f)
@@ -123,14 +107,14 @@ def solveCplex(instance) :
         mkp.solve()
        
         # Report the results with 0 cut
-        logging.info("RELAXED PL SOLUTION (UPPER BOUND)")
+        logging.info("\n\t\t\t\t\t\t*** RELAXED PL SOLUTION (UPPER BOUND) ***")
         print_solution(mkp)
         mkp.write(path_base_lp+"/0_cut.lp")
         mkp.solution.write(path_base_log+"/0_cut.log")
 
         # Generate gormory cuts
         n_cuts, b_bar = get_tableau(mkp)
-        gc_lhs, gc_rhs = generate_fract_gc(n_cuts, nCols, nRows, mkp, names,b_bar)
+        gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, nRows, mkp, names,b_bar)
         cuts, cut_limits, cut_senses=generate_gc(mkp, A, gc_lhs, gc_rhs, names)
 
         # Add the cuts sequentially and solve the problem (without slack variables)
@@ -142,7 +126,7 @@ def solveCplex(instance) :
                 names = ["cut_"+str(i+1)])
             all_constraints.append(cuts[i])
             mkp.set_problem_name(name+"_cut_n"+str(i+1))
-            logging.info("SOLUTION OF "+name+" WITH "+str(i+1)+" GOMORY CUTS APPLIED")
+            logging.info("\n\t\t\t\t\t Resolution of the problem called '"+name+"': "+str(i+1)+" Gomory cuts applied.")
             mkp.solve()
             print_solution(mkp)
             mkp.write(path_base_lp+"/"+str(i+1)+"_cut.lp")
@@ -151,7 +135,6 @@ def solveCplex(instance) :
         end_time = mkp.get_time()
         elapsed_time = end_time-start_time
         logging.info("Elapsed time: %f ", elapsed_time)
-
 
         mkp.end()
         pass

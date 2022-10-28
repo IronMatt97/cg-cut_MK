@@ -17,7 +17,7 @@
    epOpt="9.9999999999999995e-07"
    maxPrimalInfeas="0"
    maxDualInfeas="0"
-   maxPrimalResidual="7.1054273576010019e-15"
+   maxPrimalResidual="6.8833827526759706e-15"
    maxDualResidual="4.8849813083506888e-15"
    maxX="0.59485530546623711"
    maxPi="0.58199356913183287"

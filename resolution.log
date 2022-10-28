@@ -1,0 +1,59 @@
+28-Oct-22 19:56:07 - 
+---------------------------------------------------
+28-Oct-22 19:56:07 - Solving problem instance named istances/mknap0.txt
+28-Oct-22 19:56:07 - This instance has 2 variables and 1 constraints
+28-Oct-22 19:56:07 - ...Checking input coherency
+28-Oct-22 19:56:07 - ... Done.
+28-Oct-22 19:56:07 - This instance has 2 variables and 1 constraints
+28-Oct-22 19:56:07 - 
+						*** OPTIMAL PLI SOLUTION ***
+28-Oct-22 19:56:07 - 	-> Solution status = MIP_optimal
+28-Oct-22 19:56:07 - 	-> Solution value  = 5.000000
+
+28-Oct-22 19:56:07 - SLACKS SITUATION:
+28-Oct-22 19:56:07 - -> Row 0:  Slack = 0.0
+28-Oct-22 19:56:07 - 
+					 PROBLEM VARIABLES:
+28-Oct-22 19:56:07 - -> Column 0 (variable x0):  Value = 1.0
+28-Oct-22 19:56:07 - -> Column 1 (variable x1):  Value = -0.0
+28-Oct-22 19:56:07 - 
+						*** RELAXED PL SOLUTION (UPPER BOUND) ***
+28-Oct-22 19:56:07 - 	-> Solution status = optimal
+28-Oct-22 19:56:07 - 	-> Solution value  = 7.500000
+
+28-Oct-22 19:56:07 - SLACKS SITUATION:
+28-Oct-22 19:56:07 - -> Row 0:  Slack = 0.0
+28-Oct-22 19:56:07 - 
+					 PROBLEM VARIABLES:
+28-Oct-22 19:56:07 - -> Column 0 (variable x0):  Value = 0.0
+28-Oct-22 19:56:07 - -> Column 1 (variable x1):  Value = 0.5
+28-Oct-22 19:56:07 - -> Column 2 (variable s0):  Value = 0.0
+28-Oct-22 19:56:07 - 
+					 LP relaxation final tableau:
+
+28-Oct-22 19:56:07 - +1/2 x0 +x1 +1/10 s0 = 1/2
+
+28-Oct-22 19:56:07 - Cuts to generate: 1
+28-Oct-22 19:56:07 - Generating Gomory cuts...
+
+28-Oct-22 19:56:07 - Row 1 gives cut -> +1/2 x0 +1/10 s0 >= 1/2
+
+28-Oct-22 19:56:07 - *** GOMORY CUTS ***
+
+28-Oct-22 19:56:07 - -0.0 x0 +1.0 x1 <= -0.0
+
+28-Oct-22 19:56:07 - 
+					 Resolution of the problem called 'mknap0': 1 Gomory cuts applied.
+28-Oct-22 19:56:07 - 	-> Solution status = optimal
+28-Oct-22 19:56:07 - 	-> Solution value  = 5.000000
+
+28-Oct-22 19:56:07 - SLACKS SITUATION:
+28-Oct-22 19:56:07 - -> Row 0:  Slack = 0.0
+28-Oct-22 19:56:07 - -> Row 1:  Slack = 0.0
+28-Oct-22 19:56:07 - 
+					 PROBLEM VARIABLES:
+28-Oct-22 19:56:07 - -> Column 0 (variable x0):  Value = 1.0
+28-Oct-22 19:56:07 - -> Column 1 (variable x1):  Value = 0.0
+28-Oct-22 19:56:07 - -> Column 2 (variable s0):  Value = 0.0
+28-Oct-22 19:56:07 - Elapsed time: 0.001854 
+28-Oct-22 19:56:07 - ---------------------------------------------------
