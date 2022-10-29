@@ -1,5 +1,6 @@
 from internals.solver import *
 from internals.utils import *
+import warnings
 import logging
 import sys
 import os
@@ -8,40 +9,43 @@ import pandas as pd
 # TODO applicare i tagli iterativamente e loggare iterativamente su excel
 
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
+columns=["name", "cluster_type", "nvar","nconstraints","optimal_sol","sol","sol_is_integer","status","ncuts","elapsed_time","gap"]
+warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 if __name__ == '__main__':
     # Flush Log
     flushLog("resolution.log")
     # Generate istances 
-    logging.info("Generating istances .... \n")
+    print("Generating istances .... \n")
     generateIstances()
-    logging.info(".....Done.")
+    print("...Done.")
+    
     # Statistics variables in DataFrame
-    columns=["name", "cluster_type", "nvar","nconstraints","optimal_sol","sol","sol_is_integer","status","ncuts","elapsed_time","gap"]
     stats = pd.DataFrame(columns=columns)
     if len(sys.argv) == 1:
         logging.info("\n---------------------------------------------------")
         for cluster in os.listdir("instances/") :
+            print("Solving cluster '",cluster,"'...")
             for instance in os.listdir("instances/"+cluster+"/") :
                 logging.info("\n---------------------------------------------------")
-                logging.info("Solving problem instance named "+instance+";\n")
+                logging.info("Solving problem instance '"+instance+"';\n")
                 stats_i = solveProblem("instances/"+cluster+"/"+instance,cluster)
-                stats=stats.append(pd.DataFrame(stats_i,columns=columns))      
-                print("instance of type "+cluster+" solved  : ",instance)
+                stats=stats.append(pd.DataFrame(stats_i,columns=columns))
+            print("...Done.")
         logging.info("---------------------------------------------------")
-        stats.to_excel("stats.xlsx")
     elif len(sys.argv) == 2:
         cluster=sys.argv[1]
         logging.info("\n---------------------------------------------------")
-        logging.info("Solving cluster :"+cluster)
+        print("Solving cluster '",cluster,"'...")
         for instance in os.listdir("instances/"+cluster+"/") :
-                logging.info("\n---------------------------------------------------")
-                logging.info("Solving problem instance named "+instance+";\n")
-                stats_i = solveProblem("instances/"+cluster+"/"+instance,cluster)
-                print("instance of type "+cluster+" solved  : ",instance)
-                stats=stats.append(pd.DataFrame(stats_i,columns=columns))      
-        stats.to_excel("stats.xlsx")
+            logging.info("\n---------------------------------------------------")
+            logging.info("Solving problem instance '"+instance+"';\n")
+            stats_i = solveProblem("instances/"+cluster+"/"+instance,cluster)
+            stats=stats.append(pd.DataFrame(stats_i,columns=columns))
+        print("...Done.")
         logging.info("---------------------------------------------------")
     else:
-        logging.info("Invalid input.\nUsage:\n\t--> python solver.py\nor, in order to solve a specific cluster\n\t--> python solver.py {instace}.txt")
+        logging.info("Invalid input.\nUsage:\n\t--> python solver.py\nor, in order to solve a specific cluster\n\t--> python solver.py {cluster}.txt")
+    stats.to_excel("stats.xlsx")
 
