@@ -21,17 +21,27 @@
    maxIntInfeas="0"
    maxPrimalInfeas="0"
    maxX="0"
-   maxSlack="220"/>
+   maxSlack="393"/>
  <linearConstraints>
-  <constraint name="c0" index="0" slack="86"/>
-  <constraint name="c1" index="1" slack="220"/>
-  <constraint name="c2" index="2" slack="1"/>
-  <constraint name="c3" index="3" slack="108"/>
+  <constraint name="c0" index="0" slack="370"/>
+  <constraint name="c1" index="1" slack="241"/>
+  <constraint name="c2" index="2" slack="239"/>
+  <constraint name="c3" index="3" slack="312"/>
+  <constraint name="c4" index="4" slack="32"/>
+  <constraint name="c5" index="5" slack="382"/>
+  <constraint name="c6" index="6" slack="48"/>
+  <constraint name="c7" index="7" slack="285"/>
+  <constraint name="c8" index="8" slack="137"/>
+  <constraint name="c9" index="9" slack="67"/>
+  <constraint name="c10" index="10" slack="393"/>
+  <constraint name="c11" index="11" slack="176"/>
+  <constraint name="c12" index="12" slack="282"/>
  </linearConstraints>
  <variables>
   <variable name="x0" index="0" value="0"/>
   <variable name="x1" index="1" value="0"/>
   <variable name="x2" index="2" value="0"/>
+  <variable name="x3" index="3" value="0"/>
  </variables>
  <objectiveValues>
   <objective index="0" name="" value="0"/>

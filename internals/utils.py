@@ -184,12 +184,12 @@ def initialize_fract_gc(n_cuts,ncol , nrow, prob, varnames, b_bar) :
     for i in range(nrow):
         idx = 0
         output = io.StringIO()
+        cuts.append([])
         if np.floor(b_bar[i]) != b_bar[i]:
             print(f'Row {i+1} gives cut -> ', end = '', file=output)
             z = np.copy(prob.solution.advanced.binvarow(i)) # Use np.copy to avoid changing the
                                                         # optimal tableau in the problem instance
             rmatbeg[cut] = idx
-            cuts.append([])
             for j in range(ncol):
                 z[j] = z[j] - np.floor(z[j])              
                 if z[j] != 0:
@@ -206,7 +206,6 @@ def initialize_fract_gc(n_cuts,ncol , nrow, prob, varnames, b_bar) :
                         print(f'{num}/{den} {varnames[j]} ', end='',file=output)
                 gc_lhs[i,:] = z
                 cuts[i].append(z[j])
-            
             gc_rhs[cut] = b_bar[i] - np.copy(np.floor(b_bar[i])) # np.copy as above
             gc_sense[cut] = 'L'
             gc_rhs_i = fractions.Fraction(gc_rhs[cut]).limit_denominator()
@@ -218,7 +217,8 @@ def initialize_fract_gc(n_cuts,ncol , nrow, prob, varnames, b_bar) :
             contents = output.getvalue()
             output.close()
             logging.info(contents)
-   
+
+
     return gc_lhs, gc_rhs
 
 def generate_gc(mkp, A, gc_lhs, gc_rhs, names) : 
@@ -290,7 +290,7 @@ def get_lhs_rhs(prob, cut_row, cut_rhs, A):
     rhs = cut_row[ncol:]
     return lhs, rhs
 
-def determineOptimal(instance):
+def determineOptimal(instance, cluster_type):
     '''
     This function determines the optimal solution of the given instance.
     
@@ -300,7 +300,7 @@ def determineOptimal(instance):
     c, A, b = getProblemData(instance) 
     nCols, nRows = (len(c), len(b))
     # Get the instance name
-    txtname = instance.split("/")[1]    
+    txtname = instance.split("/")[2]
     name = txtname.split(".txt")[0]
     cplexlog = name+".log"
     #Program variables section ####################################################
@@ -339,8 +339,8 @@ def determineOptimal(instance):
         # Report the results 
         logging.info("\n\t\t\t\t\t\t*** OPTIMAL PLI SOLUTION ***")
         print_solution(mkp)
-        mkp.write("lp/"+name+"/optimal.lp")
-        mkp.solution.write("solutions/"+name+"/optimal.log")
+        mkp.write("lp/"+cluster_type+"/"+name+"/optimal.lp")
+        mkp.solution.write("solutions/"+cluster_type+"/"+name+"/optimal.log")
         optimal_sol= mkp.solution.get_objective_value()
     return optimal_sol
 

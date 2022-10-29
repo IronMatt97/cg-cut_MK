@@ -21,15 +21,15 @@ def solveProblem(instance : str, cluster_type : str) :
     nCols, nRows =(len(c)), (len(b))
     
     # Get the instance name
-    txtname = instance.split("/")[1]    
+    txtname = instance.split("/")[2]    
     name = txtname.split(".txt")[0]
-    if not os.path.exists("solutions/"+name):
-            os.makedirs("solutions/"+name)
-    if not os.path.exists("lp/"+name):
-            os.makedirs("lp/"+name)
+    if not os.path.exists("solutions/"+cluster_type+"/"+name):
+            os.makedirs("solutions/"+cluster_type+"/"+name)
+    if not os.path.exists("lp/"+cluster_type+"/"+name):
+            os.makedirs("lp/"+cluster_type+"/"+name)
    
-    path_base_log = str("solutions/"+name)
-    path_base_lp = str("lp/"+name)
+    path_base_log = str("solutions/"+cluster_type+"/"+name)
+    path_base_lp = str("lp/"+cluster_type+"/"+name)
 
     #Program variables section ####################################################
     names = []
@@ -66,7 +66,7 @@ def solveProblem(instance : str, cluster_type : str) :
     # Solver section    ############################################################
 
     #First of all determine the optimal solution
-    optimal_sol=determineOptimal(instance)
+    optimal_sol=determineOptimal(instance,cluster_type)
 
     with cplex.Cplex() as mkp,  open("cplexEvents.log", "w") as f:
         mkp.set_problem_name(name)

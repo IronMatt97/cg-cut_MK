@@ -1,0 +1,47 @@
+<?xml version = "1.0" encoding="UTF-8" standalone="yes"?>
+<CPLEXSolution version="1.2">
+ <header
+   problemName="inst_10"
+   solutionName="incumbent"
+   solutionIndex="-1"
+   objectiveValue="78"
+   solutionTypeValue="3"
+   solutionTypeString="primal"
+   solutionStatusValue="101"
+   solutionStatusString="integer optimal solution"
+   solutionMethodString="mip"
+   primalFeasible="1"
+   dualFeasible="1"
+   MIPNodes="0"
+   MIPIterations="3"
+   writeLevel="1"/>
+ <quality
+   epInt="1.0000000000000001e-05"
+   epRHS="9.9999999999999995e-07"
+   maxIntInfeas="0"
+   maxPrimalInfeas="0"
+   maxX="1"
+   maxSlack="349"/>
+ <linearConstraints>
+  <constraint name="c0" index="0" slack="67"/>
+  <constraint name="c1" index="1" slack="245"/>
+  <constraint name="c2" index="2" slack="2"/>
+  <constraint name="c3" index="3" slack="44"/>
+  <constraint name="c4" index="4" slack="284"/>
+  <constraint name="c5" index="5" slack="349"/>
+  <constraint name="c6" index="6" slack="211"/>
+  <constraint name="c7" index="7" slack="286"/>
+  <constraint name="c8" index="8" slack="93"/>
+  <constraint name="c9" index="9" slack="48"/>
+  <constraint name="c10" index="10" slack="30"/>
+ </linearConstraints>
+ <variables>
+  <variable name="x0" index="0" value="1"/>
+  <variable name="x1" index="1" value="0"/>
+  <variable name="x2" index="2" value="0"/>
+  <variable name="x3" index="3" value="0"/>
+ </variables>
+ <objectiveValues>
+  <objective index="0" name="" value="78"/>
+ </objectiveValues>
+</CPLEXSolution>

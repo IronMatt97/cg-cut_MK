@@ -25,7 +25,7 @@ if __name__ == '__main__':
                 logging.info("Solving problem instance named "+instance+";\n")
                 stats_i = solveProblem("instances/"+cluster+"/"+instance,cluster)
                 stats=stats.append(pd.DataFrame(stats_i,columns=columns))      
-                print("instance solved : \n,",instance)
+                print("instance solved : ",instance)
         logging.info("---------------------------------------------------")
         stats.to_excel("stats.xlsx")
     elif len(sys.argv) == 2:
@@ -36,7 +36,7 @@ if __name__ == '__main__':
                 logging.info("\n---------------------------------------------------")
                 logging.info("Solving problem instance named "+instance+";\n")
                 stats_i = solveProblem("instances/"+cluster+"/"+instance,cluster)
-                print("instance solved : \n,",instance)
+                print("instance solved : ",instance)
                 stats=stats.append(pd.DataFrame(stats_i,columns=columns))      
         stats.to_excel("stats.xlsx")
         logging.info("---------------------------------------------------")

@@ -1,0 +1,70 @@
+<?xml version = "1.0" encoding="UTF-8" standalone="yes"?>
+<CPLEXSolution version="1.2">
+ <header
+   problemName="inst_16_cut_n8"
+   objectiveValue="430.18461538461537"
+   solutionTypeValue="1"
+   solutionTypeString="basic"
+   solutionStatusValue="1"
+   solutionStatusString="optimal"
+   solutionMethodString="primal"
+   primalFeasible="1"
+   dualFeasible="1"
+   simplexIterations="0"
+   writeLevel="1"/>
+ <quality
+   epRHS="9.9999999999999995e-07"
+   epOpt="9.9999999999999995e-07"
+   maxPrimalInfeas="0"
+   maxDualInfeas="0"
+   maxPrimalResidual="5.6843418860808015e-14"
+   maxDualResidual="7.1054273576010019e-15"
+   maxX="1"
+   maxPi="0.78461538461538471"
+   maxSlack="740.35384615384612"
+   maxRedCost="69.876923076923077"
+   kappa="7447.7304526185217"/>
+ <linearConstraints>
+  <constraint name="c0" index="0" status="BS" slack="740.35384615384612" dual="-0"/>
+  <constraint name="c1" index="1" status="BS" slack="465.78461538461539" dual="-0"/>
+  <constraint name="c2" index="2" status="BS" slack="285.33846153846156" dual="-0"/>
+  <constraint name="c3" index="3" status="BS" slack="657.21538461538466" dual="-0"/>
+  <constraint name="c4" index="4" status="BS" slack="213.01538461538462" dual="-0"/>
+  <constraint name="c5" index="5" status="LL" slack="0" dual="0.78461538461538471"/>
+  <constraint name="c6" index="6" status="BS" slack="227.03076923076924" dual="-0"/>
+  <constraint name="c7" index="7" status="BS" slack="501.61538461538464" dual="-0"/>
+  <constraint name="cut_1" index="8" status="BS" slack="1.6461538461538794" dual="-0"/>
+  <constraint name="cut_2" index="9" status="BS" slack="2.2153846153845649" dual="-0"/>
+  <constraint name="cut_3" index="10" status="BS" slack="2.6615384615384592" dual="-0"/>
+  <constraint name="cut_4" index="11" status="BS" slack="2.7846153846154067" dual="-0"/>
+  <constraint name="cut_5" index="12" status="BS" slack="1.9846153846154237" dual="-0"/>
+  <constraint name="cut_6" index="13" status="BS" slack="0.58461538461538454" dual="-0"/>
+  <constraint name="cut_7" index="14" status="BS" slack="0.96923076923079776" dual="-0"/>
+  <constraint name="cut_8" index="15" status="BS" slack="1.3846153846154436" dual="-0"/>
+ </linearConstraints>
+ <variables>
+  <variable name="x0" index="0" status="UL" value="1" reducedCost="69.876923076923077"/>
+  <variable name="x1" index="1" status="UL" value="1" reducedCost="16.815384615384602"/>
+  <variable name="x2" index="2" status="LL" value="0" reducedCost="-57.984615384615395"/>
+  <variable name="x3" index="3" status="UL" value="1" reducedCost="4.446153846153841"/>
+  <variable name="x4" index="4" status="UL" value="1" reducedCost="55.430769230769229"/>
+  <variable name="x5" index="5" status="LL" value="0" reducedCost="-30.015384615384619"/>
+  <variable name="x6" index="6" status="BS" value="0.41538461538461541" reducedCost="0"/>
+  <variable name="x7" index="7" status="UL" value="1" reducedCost="24.507692307692302"/>
+  <variable name="x8" index="8" status="LL" value="0" reducedCost="-4.8769230769230845"/>
+  <variable name="x9" index="9" status="LL" value="0" reducedCost="-44.676923076923089"/>
+  <variable name="x10" index="10" status="UL" value="1" reducedCost="26.076923076923077"/>
+  <variable name="x11" index="11" status="LL" value="0" reducedCost="-55.676923076923089"/>
+  <variable name="s0" index="12" status="LL" value="0" reducedCost="0"/>
+  <variable name="s1" index="13" status="LL" value="0" reducedCost="0"/>
+  <variable name="s2" index="14" status="LL" value="0" reducedCost="0"/>
+  <variable name="s3" index="15" status="LL" value="0" reducedCost="0"/>
+  <variable name="s4" index="16" status="LL" value="0" reducedCost="0"/>
+  <variable name="s5" index="17" status="LL" value="0" reducedCost="-0.78461538461538471"/>
+  <variable name="s6" index="18" status="LL" value="0" reducedCost="0"/>
+  <variable name="s7" index="19" status="LL" value="0" reducedCost="0"/>
+ </variables>
+ <objectiveValues>
+  <objective index="0" name="" value="430.18461538461537"/>
+ </objectiveValues>
+</CPLEXSolution>

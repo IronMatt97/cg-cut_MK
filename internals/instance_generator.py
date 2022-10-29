@@ -14,7 +14,7 @@ def generateInstance(instance_num : int, nvar : int , nconstraints : int, cluste
     random.seed(getSeed())
     
     instanceName="inst_"+str(instance_num)+".txt"
-    print("\tGenerating instance called ",instanceName)
+    print("\tGenerating instance called ",instanceName , "of type ", cluster_type)
     path_name="instances/"+cluster_type
     if not os.path.exists(path_name):
             os.makedirs(path_name)
@@ -43,7 +43,7 @@ def generateClusterOfIstances(num_instances, var_range, constr_range,cluster_typ
     This function generate different clusters of istances.
     A cluster has a specific number of variables and number of contraints. 
     '''
-    print("A total of ",num_instances," instances will be created.")
+    print("A total of ",num_instances," instances of type " , cluster_type, "will be created.")
     for instance_num in range(0,num_instances):
         vars = random.randint(var_range[0], var_range[1])
         constr = random.randint(constr_range[0], constr_range[1])
