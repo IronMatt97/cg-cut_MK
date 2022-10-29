@@ -155,7 +155,7 @@ def get_tableau(prob):
     logging.info("Cuts to generate: %d", n_cuts)
     return n_cuts , b_bar
 
-def initialize_fract_gc(n_cuts,ncol , nrow, prob, varnames, b_bar) : 
+def initialize_fract_gc(n_cuts,ncol , prob, varnames, b_bar) : 
     '''
     ##Description
     
@@ -171,7 +171,7 @@ def initialize_fract_gc(n_cuts,ncol , nrow, prob, varnames, b_bar) :
         gc_lhs
         gc_rhs 
     '''
-    cuts = []
+    cuts = np.zeros([n_cuts,ncol])
     cut_limits= []
     gc_sense = [''] * n_cuts
     gc_rhs   = np.zeros(n_cuts)
@@ -181,17 +181,17 @@ def initialize_fract_gc(n_cuts,ncol , nrow, prob, varnames, b_bar) :
     rmatval  = np.zeros(ncol)
     logging.info('Generating Gomory cuts...\n')
     cut = 0  #  Index of cut to be added
-    for i in range(nrow):
+    for i in range(n_cuts):
         idx = 0
         output = io.StringIO()
-        cuts.append([])
         if np.floor(b_bar[i]) != b_bar[i]:
             print(f'Row {i+1} gives cut -> ', end = '', file=output)
             z = np.copy(prob.solution.advanced.binvarow(i)) # Use np.copy to avoid changing the
                                                         # optimal tableau in the problem instance
             rmatbeg[cut] = idx
             for j in range(ncol):
-                z[j] = z[j] - np.floor(z[j])              
+                z[j] = z[j] - np.floor(z[j])
+             
                 if z[j] != 0:
                     rmatind[idx] = j
                     rmatval[idx] = z[j]
@@ -204,8 +204,9 @@ def initialize_fract_gc(n_cuts,ncol , nrow, prob, varnames, b_bar) :
                         fj = fj.limit_denominator()
                         num, den = (fj.numerator, fj.denominator)
                         print(f'{num}/{den} {varnames[j]} ', end='',file=output)
-                gc_lhs[i,:] = z
-                cuts[i].append(z[j])
+           
+            gc_lhs[i,:] = z
+            cuts[i,:]= z
             gc_rhs[cut] = b_bar[i] - np.copy(np.floor(b_bar[i])) # np.copy as above
             gc_sense[cut] = 'L'
             gc_rhs_i = fractions.Fraction(gc_rhs[cut]).limit_denominator()

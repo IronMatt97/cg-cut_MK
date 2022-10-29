@@ -128,7 +128,7 @@ def solveProblem(instance : str, cluster_type : str) :
 
         # Generate gormory cuts
         n_cuts, b_bar = get_tableau(mkp)
-        gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, nRows, mkp, names,b_bar)
+        gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, mkp, names,b_bar)
         cuts, cut_limits, cut_senses=generate_gc(mkp, A, gc_lhs, gc_rhs, names)
 
         # Add the cuts sequentially and solve the problem (without slack variables)

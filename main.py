@@ -5,6 +5,7 @@ import sys
 import os
 import pandas as pd
 
+# TODO applicare i tagli iterativamente e loggare iterativamente su excel
 
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
 
@@ -19,13 +20,14 @@ if __name__ == '__main__':
     columns=["name", "cluster_type", "nvar","nconstraints","optimal_sol","sol","sol_is_integer","status","ncuts","elapsed_time","gap"]
     stats = pd.DataFrame(columns=columns)
     if len(sys.argv) == 1:
+        logging.info("\n---------------------------------------------------")
         for cluster in os.listdir("instances/") :
             for instance in os.listdir("instances/"+cluster+"/") :
                 logging.info("\n---------------------------------------------------")
                 logging.info("Solving problem instance named "+instance+";\n")
                 stats_i = solveProblem("instances/"+cluster+"/"+instance,cluster)
                 stats=stats.append(pd.DataFrame(stats_i,columns=columns))      
-                print("instance solved : ",instance)
+                print("instance of type "+cluster+" solved  : ",instance)
         logging.info("---------------------------------------------------")
         stats.to_excel("stats.xlsx")
     elif len(sys.argv) == 2:
@@ -36,7 +38,7 @@ if __name__ == '__main__':
                 logging.info("\n---------------------------------------------------")
                 logging.info("Solving problem instance named "+instance+";\n")
                 stats_i = solveProblem("instances/"+cluster+"/"+instance,cluster)
-                print("instance solved : ",instance)
+                print("instance of type "+cluster+" solved  : ",instance)
                 stats=stats.append(pd.DataFrame(stats_i,columns=columns))      
         stats.to_excel("stats.xlsx")
         logging.info("---------------------------------------------------")
