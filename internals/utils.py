@@ -316,13 +316,13 @@ def determineOptimal(instance, cluster_type):
     for i in range(nRows):
         constraint_names.append("c"+str(i))
         constraint_senses.append("L")
-    with cplex.Cplex() as mkp,  open("optimalResolution.log", "w") as f:
+    with cplex.Cplex() as mkp:
         mkp.set_problem_name(name)
         mkp.objective.set_sense(mkp.objective.sense.maximize)
-        mkp.set_log_stream(f)
-        mkp.set_error_stream(f)
-        mkp.set_warning_stream(f)
-        mkp.set_results_stream(f)
+        mkp.set_log_stream(None)
+        mkp.set_error_stream(None)
+        mkp.set_warning_stream(None)
+        mkp.set_results_stream(None)
         params = mkp.parameters
         # Disable presolve 
         params.preprocessing.presolve.set(0) 
@@ -348,9 +348,9 @@ def determineOptimal(instance, cluster_type):
 
 
 def generateIstances()  :
-     # Read config file
+    # Read config file
     config = ConfigParser()
-    config.read('conf.ini')
+    config.read('config.ini')
     # Get a list of all Clusters 
     for cluster in config.sections():
         logging.info('CLUSTER: %s' % cluster)
@@ -358,7 +358,7 @@ def generateIstances()  :
         constr_range=[int(config[cluster]['MIN_COSTRAINTS']),int(config[cluster]['MAX_COSTRAINTS'])]
         num_instances=int(config[cluster]['NUM_ISTANCES'])
         max_time=int(config[cluster]['MAX_TIME'])
-        generateClusterOfIstances(num_instances, var_range, constr_range,cluster)    
+        generateClusterOfIstances(num_instances, var_range, constr_range, cluster)    
 
 
 
