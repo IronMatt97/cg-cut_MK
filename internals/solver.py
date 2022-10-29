@@ -1,16 +1,20 @@
 from internals.utils import *
+from internals.statistics import *
 import logging
 import cplex
 import os
+import json
+import pandas as pd
 
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
 
-def solveProblem(instance) :
+def solveProblem(instance : str, cluster_type : str) :
     '''
     This function solves a specific problem instance
     
     Arguments:
         instance
+        stats
     '''
     # Retrieve the matrixes of the problem instance
     c, A, b = getProblemData(instance) 
@@ -55,11 +59,14 @@ def solveProblem(instance) :
         lower_bounds.append(0.0)
 
     nCols= nCols+nRows
-    
+
+    # Populate statistics 
+    tot_stats=[]
+
     # Solver section    ############################################################
 
     #First of all determine the optimal solution
-    determineOptimal(instance)
+    optimal_sol=determineOptimal(instance)
 
     with cplex.Cplex() as mkp,  open("cplexEvents.log", "w") as f:
         mkp.set_problem_name(name)
@@ -76,8 +83,8 @@ def solveProblem(instance) :
         # Register Callback 
         timelim_cb = mkp.register_callback(TimeLimitCallback)
         # Set time limit
-        timelim_cb.timelimit = 60*3  #3 min max
-        timelim_cb.aborted = False
+        timelim_cb.timelimit = 60  #3 min max
+        timelim_cb.aborted = True
         # Add variables & Slack --------------------------------------------------------------------
         mkp.variables.add(names=names)
         # Add variables 
@@ -87,7 +94,6 @@ def solveProblem(instance) :
         # Add slack
         for i in range(nCols-nRows,nCols):
             mkp.variables.set_lower_bounds(i, lower_bounds[i])
-        
         #Add slack to constraints
         A = A.tolist()
         for row in range(nRows) :
@@ -107,15 +113,18 @@ def solveProblem(instance) :
         # Start time 
         timelim_cb.starttime = mkp.get_time()
         start_time = timelim_cb.starttime
-
-        # Resolve the problem instance
+        # Resolve the problem instance with 0 cuts
         mkp.solve()
-       
         # Report the results with 0 cut
         logging.info("\n\t\t\t\t\t\t*** RELAXED PL SOLUTION (UPPER BOUND) ***")
-        print_solution(mkp)
+        sol, sol_type,status = print_solution(mkp)
         mkp.write(path_base_lp+"/0_cut.lp")
         mkp.solution.write(path_base_log+"/0_cut.log")
+        end_time = mkp.get_time()
+        elapsed_time = end_time-start_time
+        logging.info("Elapsed time: %f ", elapsed_time)
+        #Append to statistics with 0 cuts
+        tot_stats.append(getStatistics(name,cluster_type,nCols-nRows,nRows,optimal_sol,sol,sol_type,status,0,elapsed_time))
 
         # Generate gormory cuts
         n_cuts, b_bar = get_tableau(mkp)
@@ -124,6 +133,9 @@ def solveProblem(instance) :
 
         # Add the cuts sequentially and solve the problem (without slack variables)
         for i in range(len(cuts)):
+            # Start time 
+            timelim_cb.starttime = mkp.get_time()
+            start_time = timelim_cb.starttime
             mkp.linear_constraints.add(
                 lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols-nRows)], val= cuts[i])], 
                 senses= [cut_senses[i]], 
@@ -133,13 +145,15 @@ def solveProblem(instance) :
             mkp.set_problem_name(name+"_cut_n"+str(i+1))
             logging.info("\n\t\t\t\t\t Resolution of the problem called '"+name+"': "+str(i+1)+" Gomory cuts applied.")
             mkp.solve()
-            print_solution(mkp)
+            sol,sol_type,status=print_solution(mkp)
             mkp.write(path_base_lp+"/"+str(i+1)+"_cut.lp")
             mkp.solution.write(path_base_log+"/"+str(i+1)+"_cut.log")
-        
-        end_time = mkp.get_time()
-        elapsed_time = end_time-start_time
-        logging.info("Elapsed time: %f ", elapsed_time)
+            end_time = mkp.get_time()
+            elapsed_time = end_time-start_time
+            logging.info("Elapsed time: %f ", elapsed_time)
+            tot_stats.append(getStatistics(name,cluster_type,nCols-nRows,(nRows+i+1),optimal_sol,sol,sol_type,status,i+1,elapsed_time))
 
         mkp.end()
         pass
+
+    return tot_stats

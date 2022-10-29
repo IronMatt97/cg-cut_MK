@@ -1,11 +1,12 @@
 from cplex.callbacks import MIPInfoCallback
+from internals.instance_generator import *
 from typing import Tuple
 import numpy as np
 import fractions
 import logging
 import cplex
 import io
-
+from configparser import ConfigParser
 
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
 
@@ -13,10 +14,9 @@ class TimeLimitCallback(MIPInfoCallback):
     def __call__(self):
         if not self.aborted and self.has_incumbent():
             gap = 100.0 * self.get_MIP_relative_gap()
-            timeused = self.get_time() - self.starttime
+            timeused = self.get_time() - self.starttime()
             if timeused > self.timelimit:
-                logging.info("Good enough solution at", timeused, "sec., gap =",
-                      gap, "%, quitting.")
+                logging.info("Good enough solution at", timeused, "sec., gap =",gap, "%, quitting.")
                 self.aborted = True
                 self.abort()
 
@@ -74,7 +74,7 @@ def getProblemData(name: str) -> Tuple:
 
     return (c, A, b)
 
-def print_solution(prob):
+def print_solution(prob : cplex.Cplex()):
     '''
     This function print solution of problem (cplex.Cplex())
     
@@ -97,6 +97,11 @@ def print_solution(prob):
     logging.info("\n\t\t\t\t\t PROBLEM VARIABLES:")
     for j in range(ncol):
         logging.info(f'-> Column {j} (variable {varnames[j]}):  Value = {x[j]}')
+    
+    sol=  prob.solution.get_objective_value()
+    sol_type= sol.is_integer()
+    status = prob.solution.status[prob.solution.get_status()]
+    return sol, sol_type, status 
 
 def get_tableau(prob):
     '''
@@ -336,3 +341,24 @@ def determineOptimal(instance):
         print_solution(mkp)
         mkp.write("lp/"+name+"/optimal.lp")
         mkp.solution.write("solutions/"+name+"/optimal.log")
+        optimal_sol= mkp.solution.get_objective_value()
+    return optimal_sol
+
+
+
+def generateIstances()  :
+     # Read config file
+    config = ConfigParser()
+    config.read('conf.ini')
+    # Get a list of all Clusters 
+    for cluster in config.sections():
+        logging.info('CLUSTER: %s' % cluster)
+        var_range=[int(config[cluster]['MIN_N_VAR']),int(config[cluster]['MAX_N_VAR'])]
+        constr_range=[int(config[cluster]['MIN_COSTRAINTS']),int(config[cluster]['MAX_COSTRAINTS'])]
+        num_instances=int(config[cluster]['NUM_ISTANCES'])
+        max_time=int(config[cluster]['MAX_TIME'])
+        generateClusterOfIstances(num_instances, var_range, constr_range,cluster)    
+
+
+
+    
