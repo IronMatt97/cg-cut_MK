@@ -5,8 +5,13 @@ import os
 
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
 
-# This function solves a specific problem instance
 def solveProblem(instance) :
+    '''
+    This function solves a specific problem instance
+    
+    Arguments:
+        instance
+    '''
     # Retrieve the matrixes of the problem instance
     c, A, b = getProblemData(instance) 
     nCols, nRows =(len(c)), (len(b))

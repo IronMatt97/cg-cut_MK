@@ -21,11 +21,25 @@ class TimeLimitCallback(MIPInfoCallback):
                 self.abort()
 
 def flushLog(logName):
+    '''
+    This function flushes the log.
+    '''
     with open(logName,'w') as file:
         pass
 
-# Function to extract A, b and c (constraint coefficients matrix, right hand side array and objective function coefficients array)
 def getProblemData(name: str) -> Tuple:
+    '''
+    This function extracts the raw data from a .txt file and populates the objective function coefficients
+    array, the constraints coefficients matrix A and the right hand side b array
+    
+    Arguments:
+        name -- the name of the .txt file that contains the raw data
+        
+    returns:
+        c -- objective function coefficients array (shape = 1 * n)
+        A -- constraints coefficients matrix A (shape = m * n)
+        b -- right hand side values (shape = 1 * m)
+    '''
     # Opening .txt file in order to read the raw data of a problem instance
     file = open(str(name), 'r')
     x = []
@@ -61,6 +75,13 @@ def getProblemData(name: str) -> Tuple:
     return (c, A, b)
 
 def print_solution(prob):
+    '''
+    This function print solution of problem (cplex.Cplex())
+    
+    Arguments:
+        problem -- cplex.Cplex()
+    
+    '''
     ncol = len(prob.variables.get_cols())
     nrow = len(prob.linear_constraints.get_rows())
     varnames = prob.variables.get_names()
@@ -78,6 +99,16 @@ def print_solution(prob):
         logging.info(f'-> Column {j} (variable {varnames[j]}):  Value = {x[j]}')
 
 def get_tableau(prob):
+    '''
+    This function get the final tableau of the prob (cplex.Cplex())
+    
+    Arguments:
+        problem -- cplex.Cplex()
+     
+    returns:
+        n_cuts 
+        b_bar 
+    '''
     BinvA = np.array(prob.solution.advanced.binvarow())
 
     nrow = BinvA.shape[0]
@@ -119,7 +150,22 @@ def get_tableau(prob):
     logging.info("Cuts to generate: %d", n_cuts)
     return n_cuts , b_bar
 
-def initialize_fract_gc(n_cuts,ncol, nrow, prob, varnames, b_bar) : 
+def initialize_fract_gc(n_cuts,ncol , nrow, prob, varnames, b_bar) : 
+    '''
+    ##Description
+    
+    Arguments:
+        n_cuts
+        ncol
+        nrow
+        prob
+        varnames
+        b_bar
+
+    returns:
+        gc_lhs
+        gc_rhs 
+    '''
     cuts = []
     cut_limits= []
     gc_sense = [''] * n_cuts
@@ -171,6 +217,21 @@ def initialize_fract_gc(n_cuts,ncol, nrow, prob, varnames, b_bar) :
     return gc_lhs, gc_rhs
 
 def generate_gc(mkp, A, gc_lhs, gc_rhs, names) : 
+    '''
+    ##Description
+    
+    Arguments:
+        mkp
+        A
+        gc_lhs
+        gc_rhs
+        names
+
+    returns:
+        cuts
+        cuts_limits
+        cut_senses
+    '''
     logging.info('*** GOMORY CUTS ***\n')
     cuts = []
     cuts_limits = []
@@ -198,6 +259,19 @@ def generate_gc(mkp, A, gc_lhs, gc_rhs, names) :
     return cuts, cuts_limits, cut_senses
 
 def get_lhs_rhs(prob, cut_row, cut_rhs, A):
+    '''
+    ##Description
+    
+    Arguments:
+        prob
+        cut_row
+        cut_rhs
+        A
+
+    returns:
+        lhs
+        rhs
+    '''
     ncol = len(A[0])
     cut_row = np.append(cut_row, cut_rhs)
     b = np.array(prob.linear_constraints.get_rhs())
@@ -212,6 +286,12 @@ def get_lhs_rhs(prob, cut_row, cut_rhs, A):
     return lhs, rhs
 
 def determineOptimal(instance):
+    '''
+    This function determines the optimal solution of the given instance.
+    
+    Arguments:
+        instance
+    '''
     c, A, b = getProblemData(instance) 
     nCols, nRows = (len(c), len(b))
     # Get the instance name
