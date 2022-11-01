@@ -45,6 +45,12 @@ if __name__ == '__main__':
             stats=stats.append(pd.DataFrame(stats_i,columns=columns))
         print("...Done.")
         logging.info("---------------------------------------------------")
+    elif len(sys.argv) == 3:
+        if sys.argv[1] == "-s":
+            print("Solving single instance named '"+sys.argv[2]+"'")
+            stats_i = solveProblem("instances/"+"cluster_small/"+sys.argv[2],"cluster_small")
+            stats=stats.append(pd.DataFrame(stats_i,columns=columns))
+        print("...Done.")
     else:
         logging.info("Invalid input.\nUsage:\n\t--> python solver.py\nor, in order to solve a specific cluster\n\t--> python solver.py {cluster}.txt")
     stats.to_excel("stats.xlsx")
