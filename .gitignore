@@ -1,6 +1,6 @@
 internals/__pycache__
 solutions
 lp
-stats.xlsx
-resolution.log
-cplexEvents.log
+*.xlsx
+*.log
+

@@ -357,7 +357,6 @@ def generateIstances()  :
         var_range=[int(config[cluster]['MIN_N_VAR']),int(config[cluster]['MAX_N_VAR'])]
         constr_range=[int(config[cluster]['MIN_COSTRAINTS']),int(config[cluster]['MAX_COSTRAINTS'])]
         num_instances=int(config[cluster]['NUM_ISTANCES'])
-        max_time=int(config[cluster]['MAX_TIME'])
         generateClusterOfIstances(num_instances, var_range, constr_range, cluster)    
 
 
