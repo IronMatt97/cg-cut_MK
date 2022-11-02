@@ -9,23 +9,23 @@ import pandas as pd
 # TODO applicare i tagli iterativamente e loggare iterativamente su excel
 
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
-columns=["name", "cluster_type", "nvar","nconstraints","optimal_sol","sol","sol_is_integer","status","ncuts","elapsed_time","gap"]
+columns=["name", "cluster_type", "nvar","nconstraints","optimal_sol","sol","sol_is_integer","status","ncuts","elapsed_time","gap","iterations","low","upper"]
 warnings.filterwarnings('ignore')
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 if __name__ == '__main__':
     # Flush Log
     flushLog("resolution.log")
-    # Generate istances 
-    print("Generating istances .... \n")
-    generateIstances()
-    print("...Done.")
-    
+   
     # Statistics variables in DataFrame
     stats = pd.DataFrame(columns=columns)
     if len(sys.argv) == 1:
         logging.info("\n---------------------------------------------------")
         for cluster in os.listdir("instances/") :
+            # Generate istances 
+            print("Generating istances .... \n")
+            generateIstances(cluster)
+            print("...Done.")
             print("Solving cluster '",cluster,"'...")
             for instance in os.listdir("instances/"+cluster+"/") :
                 logging.info("\n---------------------------------------------------")
@@ -36,6 +36,10 @@ if __name__ == '__main__':
         logging.info("---------------------------------------------------")
     elif len(sys.argv) == 2:
         cluster=sys.argv[1]
+        # Generate istances 
+        print("Generating istances .... \n")
+        generateIstances(cluster)
+        print("...Done.")
         logging.info("\n---------------------------------------------------")
         print("Solving cluster '",cluster,"'...")
         for instance in os.listdir("instances/"+cluster+"/") :

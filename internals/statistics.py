@@ -1,19 +1,8 @@
 import random
 import os
 
-#TODO
-def generateStatistics():
-    '''
-    This function generate statistics of Solved Clusters. 
-    '''
 
-#TODO
-def saveToCSV() : 
-    '''
-    This function save to CSV info about istance solution.
-    '''
-
-def getStatistics(name,cluster_type,nVar,nConstraints,optimal_sol,sol,sol_type,status,ncuts, elapsed_time):
+def getStatistics(name,cluster_type,nVar,nConstraints,optimal_sol,sol,sol_type,status,ncuts, elapsed_time, iterations, low, upper):
     stats = []
     stats.append(name)
     stats.append(cluster_type)
@@ -30,4 +19,7 @@ def getStatistics(name,cluster_type,nVar,nConstraints,optimal_sol,sol,sol_type,s
     else : 
         gap = sol-optimal_sol
         stats.append(gap)
+    stats.append(iterations)
+    stats.append(low)
+    stats.append(upper)
     return stats

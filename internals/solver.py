@@ -32,27 +32,14 @@ def solveProblem(instance : str, cluster_type : str) :
     path_base_log = str("solutions/"+cluster_type+"/"+name)
     path_base_lp = str("lp/"+cluster_type+"/"+name)
 
-    #Program variables section ####################################################
-    names = []
-    all_constraints = []
-    lower_bounds = []
-    upper_bounds = []
-    constraint_names = []
-    constraint_senses = []
+    # Get config params
+    config = ConfigParser()
+    config.read('config.ini')
+    MAX_TIME=int(config[cluster_type]['MAX_TIME_PER_INSTANCE'])
+    THRESHOLD = 0.05
 
-    # Variables 
-    for i in range(nCols):
-        names.append("x"+str(i))
-        lower_bounds.append(0.0)
-        upper_bounds.append(1.0)
-    # Constraint 
-    for i in range(nRows):
-        constraint_names.append("c"+str(i))
-        constraint_senses.append("L")
-    # Slack 
-    for i in range(nRows):
-        names.append("s"+str(i))
-        lower_bounds.append(0.0)
+    #Program variables section ####################################################
+    names, lower_bounds, upper_bounds,constraint_senses,constraint_names =initializeInstanceVariables(nCols,nRows) 
 
     nCols= nCols+nRows
 
@@ -63,52 +50,15 @@ def solveProblem(instance : str, cluster_type : str) :
 
     #First of all determine the optimal solution
     optimal_sol=determineOptimal(instance,cluster_type)
-
-    with cplex.Cplex() as mkp,  open("cplexEvents.log", "w") as f:
-        mkp.set_problem_name(name)
-        mkp.objective.set_sense(mkp.objective.sense.maximize)
-        mkp.set_log_stream(f)
-        mkp.set_error_stream(f)
-        mkp.set_warning_stream(f)
-        mkp.set_results_stream(f)
-        params = mkp.parameters
-        # Disable presolve 
-        params.preprocessing.presolve.set(0) 
-        params.preprocessing.linear.set(0)
-        params.preprocessing.reduce.set(0)
-        # Register Callback 
-        timelim_cb = mkp.register_callback(TimeLimitCallback)
-        # Set time limit
-        timelim_cb.timelimit = 60  #3 min max
-        timelim_cb.aborted = True
-        # Add variables & Slack --------------------------------------------------------------------
-        mkp.variables.add(names=names)
-        # Add variables 
-        for i in range(nCols-nRows):
-            mkp.variables.set_lower_bounds(i, lower_bounds[i])
-            mkp.variables.set_upper_bounds(i, upper_bounds[i])
-        # Add slack
-        for i in range(nCols-nRows,nCols):
-            mkp.variables.set_lower_bounds(i, lower_bounds[i])
-        #Add slack to constraints
-        A = A.tolist()
-        for row in range(nRows) :
-            for slack in range(nRows) : 
-                if row==slack : 
-                    A[row].append(1)
-                else :
-                    A[row].append(0)
-        # Add contraints to Cplex ------------------------------------------------------------------
-        for i in range(nRows):
-            mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])], rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
-            all_constraints.append(A[i])
-        # Add objective function -----------------------------------------------------------
-        for i in range(nCols-nRows): 
-            mkp.objective.set_linear([(i, c[i])])
+    # Define threshold
+    threshold = optimal_sol * THRESHOLD
+    lower = optimal_sol
+    upper = optimal_sol + threshold
     
-        # Start time 
-        timelim_cb.starttime = mkp.get_time()
-        start_time = timelim_cb.starttime
+    with cplex.Cplex() as mkp,  open("cplexEvents.log", "w") as f:
+        # set MKP
+        setMKP(mkp,name,f,names,nCols,nRows,lower_bounds,upper_bounds,constraint_senses,constraint_names,A,b,c)
+        start_time = mkp.get_time()
         # Resolve the problem instance with 0 cuts
         mkp.solve()
         # Report the results with 0 cut
@@ -121,14 +71,11 @@ def solveProblem(instance : str, cluster_type : str) :
         elapsed_time = end_time-start_time
         logging.info("Elapsed time: %f ", elapsed_time)
         #Append to statistics with 0 cuts
-        tot_stats.append(getStatistics(name,cluster_type,nCols-nRows,nRows,optimal_sol,sol,sol_type,status,0,elapsed_time))
+        tot_stats.append(getStatistics(name,cluster_type,nCols-nRows,nRows,optimal_sol,sol,sol_type,status,0,elapsed_time,0, lower,upper))
         
         # Generate gormory cuts
-        timelim_cb.starttime = mkp.get_time()
-        start_time = timelim_cb.starttime
-        n_cuts, b_bar = get_tableau(mkp)
-        gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, mkp, names,b_bar)
-        cuts, cut_limits, cut_senses=generate_gc(mkp, A, gc_lhs, gc_rhs, names)
+        start_time = mkp.get_time()
+        cuts, cut_limits, cut_senses= applyGomory(mkp, nCols,names,A)
         
         # Add the cuts sequentially and solve the problem (without slack variables)
         for i in range(len(cuts)):
@@ -138,7 +85,6 @@ def solveProblem(instance : str, cluster_type : str) :
                 senses= [cut_senses[i]], 
                 rhs= [cut_limits[i]],
                 names = ["cut_"+str(i+1)])
-            all_constraints.append(cuts[i])
             mkp.set_problem_name(name+"_cut_n"+str(i+1))
             logging.info("\n\t\t\t\t\t Resolution of the problem called '"+name+"': "+str(i+1)+" Gomory cuts applied.")
             mkp.solve()
@@ -149,128 +95,58 @@ def solveProblem(instance : str, cluster_type : str) :
         end_time = mkp.get_time()
         elapsed_time = end_time-start_time
         logging.info("Elapsed time: %f ", elapsed_time)
-        tot_stats.append(getStatistics(name,cluster_type,nCols-nRows,(nRows+i+1),optimal_sol,sol,sol_type,status,i+1,elapsed_time))
-        
+        tot_stats.append(getStatistics(name,cluster_type,nCols-nRows,(nRows+len(cuts)),optimal_sol,sol,sol_type,status,len(cuts),elapsed_time,1,lower,upper))
         mkp.end()
         pass
-        
-    THRESHOLD = 2
+    
     start_time = time.time()
     elapsed_time = 0
-    iteration = 0
-    config = ConfigParser()
-    config.read('config.ini')
-    MAX_TIME=int(config[cluster_type]['MAX_TIME_PER_INSTANCE'])
-    
-    
-    while (sol>optimal_sol +THRESHOLD and elapsed_time < MAX_TIME):
-        
-        sol, cuts, cut_limits = iterateGomory(name,cluster_type,instance,cuts,cut_limits)
-        elapsed_time = time.time()-start_time
+    iteration = 1
+    while ( not isSolInBounds(sol,upper,lower) and elapsed_time < MAX_TIME):
         iteration += 1
-        tot_stats.append(getStatistics(name,cluster_type,nCols-nRows,(nRows+len(cuts)),optimal_sol,sol,"iteration","iteration",len(cuts),elapsed_time))
+        sol,sol_type,status,cuts,cut_limits = iterateGomory(name,cluster_type,instance,cuts,cut_limits)
+        elapsed_time = time.time()-start_time
+        tot_stats.append(getStatistics(name,cluster_type,nCols-nRows,(nRows+len(cuts)),optimal_sol,sol,sol_type,status,len(cuts),elapsed_time,iteration,lower,upper))
 
     return tot_stats
 
 def iterateGomory(name,cluster_type,instance,cuts,cut_limits):
+
     c, A, b = getProblemData(instance)
     for i in range(len(cuts)):
         A.tolist().append(cuts[i])
         b.tolist().append(cut_limits[i]) 
     nCols, nRows =(len(c)), (len(b))
+    
     # Get the instance name
-    txtname = instance.split("/")[2]    
-    name = txtname.split(".txt")[0]
-    if not os.path.exists("solutions/"+cluster_type+"/"+name):
-            os.makedirs("solutions/"+cluster_type+"/"+name)
-    if not os.path.exists("lp/"+cluster_type+"/"+name):
-            os.makedirs("lp/"+cluster_type+"/"+name)
-   
     path_base_log = str("solutions/"+cluster_type+"/"+name)
     path_base_lp = str("lp/"+cluster_type+"/"+name)
 
     #Program variables section ####################################################
-    names = []
-    all_constraints = []
-    lower_bounds = []
-    upper_bounds = []
-    constraint_names = []
-    constraint_senses = []
-
-    # Variables 
-    for i in range(nCols):
-        names.append("x"+str(i))
-        lower_bounds.append(0.0)
-        upper_bounds.append(1.0)
-    # Constraint 
-    for i in range(nRows):
-        constraint_names.append("c"+str(i))
-        constraint_senses.append("L")
-    # Slack 
-    for i in range(nRows):
-        names.append("s"+str(i))
-        lower_bounds.append(0.0)
-
+    names, lower_bounds, upper_bounds,constraint_senses,constraint_names =initializeInstanceVariables(nCols,nRows) 
     nCols= nCols+nRows
 
     # Populate statistics 
 
     with cplex.Cplex() as mkp,  open("cplexEvents.log", "w") as f:
-        mkp.set_problem_name(name)
-        mkp.objective.set_sense(mkp.objective.sense.maximize)
-        mkp.set_log_stream(f)
-        mkp.set_error_stream(f)
-        mkp.set_warning_stream(f)
-        mkp.set_results_stream(f)
-        params = mkp.parameters
-        # Disable presolve 
-        params.preprocessing.presolve.set(0) 
-        params.preprocessing.linear.set(0)
-        params.preprocessing.reduce.set(0)
-        
-        # Add variables & Slack --------------------------------------------------------------------
-        mkp.variables.add(names=names)
-        # Add variables 
-        for i in range(nCols-nRows):
-            mkp.variables.set_lower_bounds(i, lower_bounds[i])
-            mkp.variables.set_upper_bounds(i, upper_bounds[i])
-        # Add slack
-        for i in range(nCols-nRows,nCols):
-            mkp.variables.set_lower_bounds(i, lower_bounds[i])
-        #Add slack to constraints
-        A = A.tolist()
-        for row in range(nRows) :
-            for slack in range(nRows) : 
-                if row==slack : 
-                    A[row].append(1)
-                else :
-                    A[row].append(0)
-        # Add contraints to Cplex ------------------------------------------------------------------
-        for i in range(nRows):
-            mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])], rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
-            all_constraints.append(A[i])
-        # Add objective function -----------------------------------------------------------
-        for i in range(nCols-nRows): 
-            mkp.objective.set_linear([(i, c[i])])
-    
-    
+        # set mkp
+        setMKP(mkp,name,f,names,nCols,nRows,lower_bounds,upper_bounds,constraint_senses,constraint_names,A,b,c)
+        # solve mkp
         mkp.solve()
-        
+        # get solution
         sol, sol_type,status = print_solution(mkp)
         mkp.write(path_base_lp+"/0_cut.lp")
         mkp.solution.write(path_base_log+"/0_cut.log")
         ########################################################################à
-        n_cuts, b_bar = get_tableau(mkp)
-        gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, mkp, names,b_bar)
-        cuts2, cut_limits2, cut_senses2=generate_gc(mkp, A, gc_lhs, gc_rhs, names)
+        new_cuts, new_cut_limits, new_cut_senses= applyGomory(mkp, nCols,names,A)
         
         # Add the cuts sequentially and solve the problem (without slack variables)
-        for i in range(len(cuts2)):
+        for i in range(len(new_cuts)):
             # Start time 
             mkp.linear_constraints.add(
-                lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols-nRows)], val= cuts2[i])], 
-                senses= [cut_senses2[i]], 
-                rhs= [cut_limits2[i]],
+                lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols-nRows)], val= new_cuts[i])], 
+                senses= [new_cut_senses[i]], 
+                rhs= [new_cut_limits[i]],
                 names = ["cut_"+str(i+1)])
             mkp.set_problem_name(name+"_cut_n"+str(i+1))
             logging.info("\n\t\t\t\t\t Resolution of the problem called '"+name+"': "+str(i+1)+" Gomory cuts applied.")
@@ -279,14 +155,14 @@ def iterateGomory(name,cluster_type,instance,cuts,cut_limits):
             mkp.write(path_base_lp+"/"+str(i+1)+"_cut.lp")
             mkp.solution.write(path_base_log+"/"+str(i+1)+"_cut.log")
             
-
-
-        for cut in cuts2:
+        for cut in new_cuts:
             cuts.append(cut)
-        for cut_lim in cut_limits2:
+        for cut_lim in new_cut_limits:
             cut_limits.append(cut_lim)
+
+        sol,sol_type,status=print_solution(mkp)
         ########################################################################à
         mkp.end()
         pass
 
-    return sol,cuts,cut_limits
+    return sol,sol_type,status,cuts,cut_limits
