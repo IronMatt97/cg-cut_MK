@@ -21,7 +21,9 @@ if __name__ == '__main__':
     stats = pd.DataFrame(columns=columns)
     if len(sys.argv) == 1:
         logging.info("\n---------------------------------------------------")
-        for cluster in os.listdir("instances/") :
+        config = ConfigParser()
+        config.read('config.ini')
+        for cluster in config.sections():
             # Generate istances 
             print("Generating istances .... \n")
             generateIstances(cluster)
