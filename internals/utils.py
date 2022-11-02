@@ -157,7 +157,6 @@ def initialize_fract_gc(n_cuts,ncol , prob, varnames, b_bar) :
         prob
         varnames
         b_bar
-
     returns:
         gc_lhs
         gc_rhs 
@@ -213,6 +212,7 @@ def initialize_fract_gc(n_cuts,ncol , prob, varnames, b_bar) :
 
     return gc_lhs, gc_rhs
 
+
 def generate_gc(mkp, A, gc_lhs, gc_rhs, names) : 
     '''
     ##Description
@@ -223,7 +223,6 @@ def generate_gc(mkp, A, gc_lhs, gc_rhs, names) :
         gc_lhs
         gc_rhs
         names
-
     returns:
         cuts
         cuts_limits
@@ -264,7 +263,6 @@ def get_lhs_rhs(prob, cut_row, cut_rhs, A):
         cut_row
         cut_rhs
         A
-
     returns:
         lhs
         rhs
@@ -281,7 +279,7 @@ def get_lhs_rhs(prob, cut_row, cut_rhs, A):
     lhs = cut_row[:len(plotted_vars)]
     rhs = cut_row[ncol:]
     return lhs, rhs
-
+    
 def determineOptimal(instance, cluster_type):
     '''
     This function determines the optimal solution of the given instance.
@@ -353,16 +351,6 @@ def generateIstances(cluster_type)  :
 
 
 
-    
-def generateCompleteGomory(mkp,nCols,names,A) : 
-
-    n_cuts, b_bar = get_tableau(mkp)
-    gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, mkp, names,b_bar)
-    cuts, cut_limits, cut_senses=generate_gc(mkp, A, gc_lhs, gc_rhs, names)  
-
-    return  cuts, cut_limits, cut_senses
-
-
 def initializeInstanceVariables(nCols,nRows) : 
         names = []
         lower_bounds = []
@@ -417,17 +405,20 @@ def setMKP(mkp,name,f,names,nCols,nRows,lower_bounds,upper_bounds,constraint_sen
                 A[row].append(1)
             else :
                 A[row].append(0)
+   
     # Add contraints to Cplex ------------------------------------------------------------------
     for i in range(nRows):
         mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])], rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
     # Add objective function -----------------------------------------------------------
     for i in range(nCols-nRows): 
         mkp.objective.set_linear([(i, c[i])])
-
+    
+    return mkp
 
 def applyGomory(mkp, nCols,names,A) : 
     n_cuts, b_bar = get_tableau(mkp)
     gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, mkp, names,b_bar)
+    #gc_lhs, gc_rhs = initialize_int_gc(n_cuts, nCols, mkp, names,b_bar)
     cuts2, cut_limits2, cut_senses2=generate_gc(mkp, A, gc_lhs, gc_rhs, names)
 
     return cuts2, cut_limits2, cut_senses2
