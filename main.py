@@ -6,7 +6,7 @@ import logging
 import sys
 import os
 
-columns=["name", "cluster_type", "nvar","nconstraints","optimal_sol","sol","sol_is_integer","status","ncuts","elapsed_time","gap","iterations","low","upper"]
+columns=["name", "cluster_type", "nvar","nconstraints","optimal_sol","sol","sol_is_integer","status","ncuts","elapsed_time","gap","relative_gap","iterations"]
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings('ignore')

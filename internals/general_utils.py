@@ -4,10 +4,11 @@ import logging
 import random
 import sys
 import os
+import math
 
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
 
-def getStatistics(name,cluster_type,nVar,nConstraints,optimal_sol,sol,sol_type,status,ncuts, elapsed_time, iterations, low, upper):
+def getStatistics(name,cluster_type,nVar,nConstraints,optimal_sol,sol,sol_type,status,ncuts, elapsed_time, iterations):
     stats = []
     stats.append(name)
     stats.append(cluster_type)
@@ -18,16 +19,21 @@ def getStatistics(name,cluster_type,nVar,nConstraints,optimal_sol,sol,sol_type,s
     stats.append(sol_type)
     stats.append(status)
     stats.append(ncuts)
-    stats.append(elapsed_time)
+    stats.append(round(elapsed_time))
+    stats.append(modulus(sol,optimal_sol))
     if optimal_sol==sol :
-        stats.append(0) #0 gap
+        stats.append(0)
     else : 
-        gap = sol-optimal_sol
-        stats.append(gap)
+        stats.append(modulus(sol,optimal_sol)/(optimal_sol+pow(10,-10)))
     stats.append(iterations)
-    stats.append(low)
-    stats.append(upper)
     return stats
+
+def modulus(x, y):
+    if x >= y:
+        result = x - y
+    else:
+        result = y - x
+    return result
 
 def generateIstances(cluster_type)  :
     # Read config file
@@ -104,8 +110,6 @@ def flushLog(logName):
     with open(logName,'w') as file:
         pass 
 
-def isSolInBounds(sol,lower,upper):
-    return sol<upper and sol>lower
 
 def invalidInput():
     print("Invalid input.\nUsage:\n"
