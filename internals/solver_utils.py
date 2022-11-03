@@ -1,22 +1,13 @@
-from cplex.callbacks import MIPInfoCallback
-from internals.instance_generator import *
+
 from typing import Tuple
 import numpy as np
 import fractions
 import logging
 import cplex
 import io
-from configparser import ConfigParser
 
+columns=["name", "cluster_type", "nvar","nconstraints","optimal_sol","sol","sol_is_integer","status","ncuts","elapsed_time","gap","iterations","low","upper"]
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
-
-
-def flushLog(logName):
-    '''
-    This function flushes the log.
-    '''
-    with open(logName,'w') as file:
-        pass
 
 def getProblemData(name: str) -> Tuple:
     '''
@@ -62,37 +53,7 @@ def getProblemData(name: str) -> Tuple:
     b = np.array([float(x.pop(0)) for i in range(int(NumRows))])
     assert len(b) == NumRows
     assert type(b) == np.ndarray
-
     return (c, A, b)
-
-def print_solution(prob : cplex.Cplex()):
-    '''
-    This function print solution of problem (cplex.Cplex())
-    
-    Arguments:
-        problem -- cplex.Cplex()
-    
-    '''
-    ncol = len(prob.variables.get_cols())
-    nrow = len(prob.linear_constraints.get_rows())
-    varnames = prob.variables.get_names()
-    slack = np.round(prob.solution.get_linear_slacks(), 3)
-    x = np.round(prob.solution.get_values(), 3)
-
-    # Log everything about the solutions found
-    logging.info("\t-> Solution status = %s", prob.solution.status[prob.solution.get_status()])
-    logging.info("\t-> Solution value  = %f\n", prob.solution.get_objective_value())
-    logging.info("SLACKS SITUATION:")
-    for i in range(nrow):
-        logging.info(f'-> Row {i}:  Slack = {slack[i]}')
-    logging.info("\n\t\t\t\t\t PROBLEM VARIABLES:")
-    for j in range(ncol):
-        logging.info(f'-> Column {j} (variable {varnames[j]}):  Value = {x[j]}')
-    
-    sol=  prob.solution.get_objective_value()
-    sol_type= sol.is_integer()
-    status = prob.solution.status[prob.solution.get_status()]
-    return sol, sol_type, status 
 
 def get_tableau(prob):
     '''
@@ -142,9 +103,130 @@ def get_tableau(prob):
         # Count the number of cuts to be generated
         if np.floor(b_bar[i]) != b_bar[i]:
             n_cuts += 1    
-    
     logging.info("Cuts to generate: %d", n_cuts)
     return n_cuts , b_bar
+
+def setMKP(mkp,name,f,names,nCols,nRows,lower_bounds,upper_bounds,constraint_senses,constraint_names,A,b,c) : 
+    mkp.set_problem_name(name)
+    mkp.objective.set_sense(mkp.objective.sense.maximize)
+    mkp.set_log_stream(f)
+    mkp.set_error_stream(f)
+    mkp.set_warning_stream(f)
+    mkp.set_results_stream(f)
+    params = mkp.parameters
+    # Disable presolve 
+    params.preprocessing.presolve.set(0) 
+    params.preprocessing.linear.set(0)
+    params.preprocessing.reduce.set(0)
+    
+    # Add variables & Slack --------------------------------------------------------------------
+    mkp.variables.add(names=names)
+    # Add variables 
+    for i in range(nCols-nRows):
+        mkp.variables.set_lower_bounds(i, lower_bounds[i])
+        mkp.variables.set_upper_bounds(i, upper_bounds[i])
+    # Add slack
+    for i in range(nCols-nRows,nCols):
+        mkp.variables.set_lower_bounds(i, lower_bounds[i])
+    #Add slack to constraints
+    A = A.tolist()
+    for row in range(nRows) :
+        for slack in range(nRows) : 
+            if row==slack : 
+                A[row].append(1)
+            else :
+                A[row].append(0)
+   
+    # Add contraints to Cplex ------------------------------------------------------------------
+    for i in range(nRows):
+        mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])], rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
+    # Add objective function -----------------------------------------------------------
+    for i in range(nCols-nRows): 
+        mkp.objective.set_linear([(i, c[i])])
+    return mkp
+
+def initializeInstanceVariables(nCols,nRows) : 
+        names = []
+        lower_bounds = []
+        upper_bounds = []
+        constraint_names = []
+        constraint_senses = []
+
+        # Variables 
+        for i in range(nCols):
+            names.append("x"+str(i))
+            lower_bounds.append(0.0)
+            upper_bounds.append(1.0)
+        # Constraint 
+        for i in range(nRows):
+            constraint_names.append("c"+str(i))
+            constraint_senses.append("L")
+        # Slack 
+        for i in range(nRows):
+            names.append("s"+str(i))
+            lower_bounds.append(0.0)
+        return names, lower_bounds, upper_bounds,constraint_senses,constraint_names
+
+def determineOptimal(instance, cluster_type):
+    '''
+    This function determines the optimal solution of the given instance.
+    
+    Arguments:
+        instance
+    '''
+    c, A, b = getProblemData(instance) 
+    nCols, nRows = (len(c), len(b))
+    # Get the instance name
+    txtname = instance.split("/")[2]
+    name = txtname.split(".txt")[0]
+    cplexlog = name+".log"
+    #Program variables section ####################################################
+    names = []
+    all_constraints = []
+    constraint_names = []
+    constraint_senses = []
+    # Variables 
+    for i in range(nCols):
+        names.append("x"+str(i))
+    # Constraint 
+    for i in range(nRows):
+        constraint_names.append("c"+str(i))
+        constraint_senses.append("L")
+    with cplex.Cplex() as mkp:
+        mkp.set_problem_name(name)
+        mkp.objective.set_sense(mkp.objective.sense.maximize)
+        mkp.set_log_stream(None)
+        mkp.set_error_stream(None)
+        mkp.set_warning_stream(None)
+        mkp.set_results_stream(None)
+        params = mkp.parameters
+        # Disable presolve 
+        params.preprocessing.presolve.set(0) 
+        # Add variables & Slack --------------------------------------------------------------------
+        mkp.variables.add(names=names, types=[mkp.variables.type.binary] * nCols)
+        # Add contraints -------------------------------------------------------------------
+        for i in range(nRows):
+            mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])],
+             rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
+            all_constraints.append(A[i])
+        # Add objective function -----------------------------------------------------------
+        for i in range(nCols): 
+            mkp.objective.set_linear([(i, c[i])])
+        # Resolve the problem instance
+        mkp.solve()
+        # Report the results 
+        logging.info("\n\t\t\t\t\t\t*** OPTIMAL PLI SOLUTION ***")
+        print_solution(mkp)
+        mkp.write("lp/"+cluster_type+"/"+name+"/optimal.lp")
+        mkp.solution.write("solutions/"+cluster_type+"/"+name+"/optimal.log")
+        optimal_sol= mkp.solution.get_objective_value()
+    return optimal_sol
+
+def applyGomory(mkp, nCols,names,A) : 
+    n_cuts, b_bar = get_tableau(mkp)
+    gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, mkp, names,b_bar)
+    cuts2, cut_limits2, cut_senses2=generate_gc(mkp, A, gc_lhs, gc_rhs, names)
+    return cuts2, cut_limits2, cut_senses2
 
 def initialize_fract_gc(n_cuts,ncol , prob, varnames, b_bar) : 
     '''
@@ -208,10 +290,7 @@ def initialize_fract_gc(n_cuts,ncol , prob, varnames, b_bar) :
             contents = output.getvalue()
             output.close()
             logging.info(contents)
-
-
     return gc_lhs, gc_rhs
-
 
 def generate_gc(mkp, A, gc_lhs, gc_rhs, names) : 
     '''
@@ -280,151 +359,31 @@ def get_lhs_rhs(prob, cut_row, cut_rhs, A):
     rhs = cut_row[ncol:]
     return lhs, rhs
     
-def determineOptimal(instance, cluster_type):
+def print_solution(prob : cplex.Cplex()):
     '''
-    This function determines the optimal solution of the given instance.
+    This function print solution of problem (cplex.Cplex())
     
     Arguments:
-        instance
+        problem -- cplex.Cplex()
+    
     '''
-    c, A, b = getProblemData(instance) 
-    nCols, nRows = (len(c), len(b))
-    # Get the instance name
-    txtname = instance.split("/")[2]
-    name = txtname.split(".txt")[0]
-    cplexlog = name+".log"
-    #Program variables section ####################################################
-    names = []
-    all_constraints = []
-    constraint_names = []
-    constraint_senses = []
-    # Variables 
-    for i in range(nCols):
-        names.append("x"+str(i))
-    # Constraint 
-    for i in range(nRows):
-        constraint_names.append("c"+str(i))
-        constraint_senses.append("L")
-    with cplex.Cplex() as mkp:
-        mkp.set_problem_name(name)
-        mkp.objective.set_sense(mkp.objective.sense.maximize)
-        mkp.set_log_stream(None)
-        mkp.set_error_stream(None)
-        mkp.set_warning_stream(None)
-        mkp.set_results_stream(None)
-        params = mkp.parameters
-        # Disable presolve 
-        params.preprocessing.presolve.set(0) 
-        # Add variables & Slack --------------------------------------------------------------------
-        mkp.variables.add(names=names, types=[mkp.variables.type.binary] * nCols)
-        # Add contraints -------------------------------------------------------------------
-        for i in range(nRows):
-            mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])], rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
-            all_constraints.append(A[i])
-        # Add objective function -----------------------------------------------------------
-        for i in range(nCols): 
-            mkp.objective.set_linear([(i, c[i])])
-        # Resolve the problem instance
-        mkp.solve()
-        # Report the results 
-        logging.info("\n\t\t\t\t\t\t*** OPTIMAL PLI SOLUTION ***")
-        print_solution(mkp)
-        mkp.write("lp/"+cluster_type+"/"+name+"/optimal.lp")
-        mkp.solution.write("solutions/"+cluster_type+"/"+name+"/optimal.log")
-        optimal_sol= mkp.solution.get_objective_value()
-    return optimal_sol
+    ncol = len(prob.variables.get_cols())
+    nrow = len(prob.linear_constraints.get_rows())
+    varnames = prob.variables.get_names()
+    slack = np.round(prob.solution.get_linear_slacks(), 3)
+    x = np.round(prob.solution.get_values(), 3)
 
-
-
-def generateIstances(cluster_type)  :
-    # Read config file
-    config = ConfigParser()
-    config.read('config.ini')
-    # Get a list of all Clusters 
-    for cluster in config.sections():
-        if cluster_type == cluster : 
-            logging.info('CLUSTER: %s' % cluster)
-            var_range=[int(config[cluster]['MIN_N_VAR']),int(config[cluster]['MAX_N_VAR'])]
-            constr_range=[int(config[cluster]['MIN_COSTRAINTS']),int(config[cluster]['MAX_COSTRAINTS'])]
-            num_instances=int(config[cluster]['NUM_ISTANCES'])
-            generateClusterOfIstances(num_instances, var_range, constr_range, cluster)    
-
-
-
-def initializeInstanceVariables(nCols,nRows) : 
-        names = []
-        lower_bounds = []
-        upper_bounds = []
-        constraint_names = []
-        constraint_senses = []
-
-        # Variables 
-        for i in range(nCols):
-            names.append("x"+str(i))
-            lower_bounds.append(0.0)
-            upper_bounds.append(1.0)
-        # Constraint 
-        for i in range(nRows):
-            constraint_names.append("c"+str(i))
-            constraint_senses.append("L")
-        # Slack 
-        for i in range(nRows):
-            names.append("s"+str(i))
-            lower_bounds.append(0.0)
-
-        return names, lower_bounds, upper_bounds,constraint_senses,constraint_names
-
-
-def setMKP(mkp,name,f,names,nCols,nRows,lower_bounds,upper_bounds,constraint_senses,constraint_names,A,b,c) : 
-    mkp.set_problem_name(name)
-    mkp.objective.set_sense(mkp.objective.sense.maximize)
-    mkp.set_log_stream(f)
-    mkp.set_error_stream(f)
-    mkp.set_warning_stream(f)
-    mkp.set_results_stream(f)
-    params = mkp.parameters
-    # Disable presolve 
-    params.preprocessing.presolve.set(0) 
-    params.preprocessing.linear.set(0)
-    params.preprocessing.reduce.set(0)
+    # Log everything about the solutions found
+    logging.info("\t-> Solution status = %s", prob.solution.status[prob.solution.get_status()])
+    logging.info("\t-> Solution value  = %f\n", prob.solution.get_objective_value())
+    logging.info("SLACKS SITUATION:")
+    for i in range(nrow):
+        logging.info(f'-> Row {i}:  Slack = {slack[i]}')
+    logging.info("\n\t\t\t\t\t PROBLEM VARIABLES:")
+    for j in range(ncol):
+        logging.info(f'-> Column {j} (variable {varnames[j]}):  Value = {x[j]}')
     
-    # Add variables & Slack --------------------------------------------------------------------
-    mkp.variables.add(names=names)
-    # Add variables 
-    for i in range(nCols-nRows):
-        mkp.variables.set_lower_bounds(i, lower_bounds[i])
-        mkp.variables.set_upper_bounds(i, upper_bounds[i])
-    # Add slack
-    for i in range(nCols-nRows,nCols):
-        mkp.variables.set_lower_bounds(i, lower_bounds[i])
-    #Add slack to constraints
-    A = A.tolist()
-    for row in range(nRows) :
-        for slack in range(nRows) : 
-            if row==slack : 
-                A[row].append(1)
-            else :
-                A[row].append(0)
-   
-    # Add contraints to Cplex ------------------------------------------------------------------
-    for i in range(nRows):
-        mkp.linear_constraints.add(lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols)], val= A[i])], rhs= [b[i]], names = [constraint_names[i]], senses = [constraint_senses[i]])
-    # Add objective function -----------------------------------------------------------
-    for i in range(nCols-nRows): 
-        mkp.objective.set_linear([(i, c[i])])
-    
-    return mkp
-
-def applyGomory(mkp, nCols,names,A) : 
-    n_cuts, b_bar = get_tableau(mkp)
-    gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, mkp, names,b_bar)
-    #gc_lhs, gc_rhs = initialize_int_gc(n_cuts, nCols, mkp, names,b_bar)
-    cuts2, cut_limits2, cut_senses2=generate_gc(mkp, A, gc_lhs, gc_rhs, names)
-
-    return cuts2, cut_limits2, cut_senses2
-
-def isSolInBounds(sol,lower,upper) :
-    
-    return sol<upper and sol>lower
-
-    
+    sol=  prob.solution.get_objective_value()
+    sol_type= sol.is_integer()
+    status = prob.solution.status[prob.solution.get_status()]
+    return sol, sol_type, status
