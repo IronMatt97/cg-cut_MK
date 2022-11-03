@@ -28,11 +28,12 @@ if __name__ == '__main__':
             for cluster in config.sections():
                 generateIstances(cluster)
             print("...Done.")
-            
-            print("Solving cluster '",cluster,"'...")
-            for instance in os.listdir("instances/"+cluster+"/") :
-                stats=solveInstance(instance,cluster,stats)
-            print("...Done.")
+
+            for cluster in config.sections()  :     
+                print("Solving cluster '",cluster,"'...")
+                for instance in os.listdir("instances/"+cluster+"/") :
+                    stats=solveInstance(instance,cluster,stats)
+                print("...Done.")
 
     elif len(sys.argv) == 3:
         execution_type = sys.argv[1]
