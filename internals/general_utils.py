@@ -23,7 +23,7 @@ def getStatistics(name,cluster_type,nVar,nConstraints,optimal_sol,sol,sol_type,s
     stats.append(modulus(sol,optimal_sol))
     if optimal_sol==sol :
         stats.append(0)
-    else : 
+    else :
         stats.append(modulus(sol,optimal_sol)/(optimal_sol+pow(10,-10)))
     stats.append(iterations)
     return stats
