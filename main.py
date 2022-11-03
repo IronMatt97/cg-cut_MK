@@ -27,9 +27,6 @@ if __name__ == '__main__':
             print("Generating istances ....")
             for cluster in config.sections():
                 generateIstances(cluster)
-            print("...Done.")
-
-            for cluster in config.sections()  :     
                 print("Solving cluster '",cluster,"'...")
                 for instance in os.listdir("instances/"+cluster+"/") :
                     stats=solveInstance(instance,cluster,stats)
