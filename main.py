@@ -1,63 +1,57 @@
-from internals.solver import *
-from internals.utils import *
+from internals.solver import solveInstance
+from internals.general_utils import *
+import pandas as pd
 import warnings
 import logging
 import sys
 import os
-import pandas as pd
 
-# TODO applicare i tagli iterativamente e loggare iterativamente su excel
-
-logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
 columns=["name", "cluster_type", "nvar","nconstraints","optimal_sol","sol","sol_is_integer","status","ncuts","elapsed_time","gap","iterations","low","upper"]
-warnings.filterwarnings('ignore')
+logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings('ignore')
 
 if __name__ == '__main__':
     # Flush Log
     flushLog("resolution.log")
-   
     # Statistics variables in DataFrame
     stats = pd.DataFrame(columns=columns)
-    if len(sys.argv) == 1:
-        logging.info("\n---------------------------------------------------")
-        config = ConfigParser()
-        config.read('config.ini')
-        for cluster in config.sections():
-            # Generate istances 
-            print("Generating istances .... \n")
-            generateIstances(cluster)
+    # Read the configuration file
+    config = ConfigParser()
+    config.read('config.ini')
+
+    if len(sys.argv) == 2:
+        if not sys.argv[1]=="-all":
+            invalidInput()
+        else:
+            print("Generating istances ....")
+            for cluster in config.sections():
+                generateIstances(cluster)
             print("...Done.")
+            
             print("Solving cluster '",cluster,"'...")
             for instance in os.listdir("instances/"+cluster+"/") :
-                logging.info("\n---------------------------------------------------")
-                logging.info("Solving problem instance '"+instance+"';\n")
-                stats_i = solveProblem("instances/"+cluster+"/"+instance,cluster)
-                stats=stats.append(pd.DataFrame(stats_i,columns=columns))
+                stats=solveInstance(instance,cluster,stats)
             print("...Done.")
-        logging.info("---------------------------------------------------")
-    elif len(sys.argv) == 2:
-        cluster=sys.argv[1]
-        # Generate istances 
-        print("Generating istances .... \n")
-        generateIstances(cluster)
-        print("...Done.")
-        logging.info("\n---------------------------------------------------")
-        print("Solving cluster '",cluster,"'...")
-        for instance in os.listdir("instances/"+cluster+"/") :
-            logging.info("\n---------------------------------------------------")
-            logging.info("Solving problem instance '"+instance+"';\n")
-            stats_i = solveProblem("instances/"+cluster+"/"+instance,cluster)
-            stats=stats.append(pd.DataFrame(stats_i,columns=columns))
-        print("...Done.")
-        logging.info("---------------------------------------------------")
-    elif len(sys.argv) == 3:
-        if sys.argv[1] == "-s":
-            print("Solving single instance named '"+sys.argv[2]+"'")
-            stats_i = solveProblem("instances/"+"cluster_small/"+sys.argv[2],"cluster_small")
-            stats=stats.append(pd.DataFrame(stats_i,columns=columns))
-        print("...Done.")
-    else:
-        logging.info("Invalid input.\nUsage:\n\t--> python solver.py\nor, in order to solve a specific cluster\n\t--> python solver.py {cluster}.txt")
-    stats.to_excel("stats.xlsx")
 
+    elif len(sys.argv) == 3:
+        execution_type = sys.argv[1]
+        if execution_type == "-c":
+            cluster=sys.argv[2]
+            print("Generating istances ....")
+            generateIstances(cluster)
+            print("...Done.")
+            
+            print("Solving cluster '",cluster,"'...")
+            for instance in os.listdir("instances/"+cluster+"/") :
+                stats=solveInstance(instance,cluster,stats)
+            print("...Done.")
+            
+        elif execution_type == "-s":
+            stats=solveInstance(sys.argv[2].split("/")[2],sys.argv[2].split("/")[1],stats)
+            print("...Done.")
+        else:
+            invalidInput()
+    else:
+        invalidInput()
+    stats.to_excel("stats.xlsx")

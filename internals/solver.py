@@ -1,13 +1,19 @@
-from internals.utils import *
-from internals.statistics import *
+from internals.general_utils import getStatistics, isSolInBounds
+from internals.solver_utils import *
+from configparser import ConfigParser
+import pandas as pd
 import logging
 import cplex
 import time
 import os
-import json
-import pandas as pd
 
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
+
+def solveInstance(instance,cluster,stats):
+    logging.info("\n---------------------------------------------------")
+    logging.info("Solving problem instance '"+instance+"';\n")
+    stats_i = solveProblem("instances/"+cluster+"/"+instance,cluster)
+    return stats.append(pd.DataFrame(stats_i,columns=columns))
 
 def solveProblem(instance : str, cluster_type : str) :
     '''
@@ -21,7 +27,6 @@ def solveProblem(instance : str, cluster_type : str) :
     c, A, b = getProblemData(instance) 
     nCols, nRows =(len(c)), (len(b))
 
-    
     # Get the instance name
     txtname = instance.split("/")[2]    
     name = txtname.split(".txt")[0]
