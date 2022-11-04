@@ -1,4 +1,4 @@
-from internals.general_utils import getStatistics
+from internals.general_utils import *
 from internals.solver_utils import *
 from configparser import ConfigParser
 import pandas as pd
@@ -60,6 +60,7 @@ def solveProblem(instance : str, cluster_type : str) :
     
      
     with cplex.Cplex() as mkp,  open("cplexEvents.log", "w") as f:
+        
         # set MKP
         mkp.set_problem_name(name)
         mkp.objective.set_sense(mkp.objective.sense.maximize)
@@ -99,7 +100,11 @@ def solveProblem(instance : str, cluster_type : str) :
         for i in range(nCols-nRows): 
             mkp.objective.set_linear([(i, c[i])])
 
-        start_time = datetime.datetime.now()
+        # Total time
+        total_time = 0.0
+        ###########################################
+        # Start time for first iteration
+        start_iteration_time = datetime.datetime.now()
         # Resolve the problem instance with 0 cuts
         mkp.solve()
         # Report the results with 0 cut
@@ -111,22 +116,22 @@ def solveProblem(instance : str, cluster_type : str) :
             os.makedirs(path_base_lp+"/iteration0")
         mkp.write(path_base_lp+"/iteration0/0_cut.lp")
         mkp.solution.write(path_base_log+"/iteration0/0_cut.log")
-        elapsed_time = (datetime.datetime.now()-start_time).total_seconds() * 1000
-        logging.info("Elapsed time: %s Milliseconds", elapsed_time)
+        elapsed_time = (datetime.datetime.now()-start_iteration_time).total_seconds() * 1000
+        logging.info("Iteration time: %s Milliseconds", elapsed_time)
         #Append to statistics with 0 cuts
         tot_stats.append(getStatistics(name,cluster_type,nCols-nRows,nRows,optimal_sol,sol,sol_type,status,0,elapsed_time,0))
         
         # Generate gormory cuts
-        
         n_cuts, b_bar = get_tableau(mkp)
         gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, mkp, names,b_bar)
         cuts, cut_limits, cut_senses=generate_gc(mkp, A, gc_lhs, gc_rhs, names)
         
         # Add the cuts sequentially and solve the problem (without slack variables)
         break_before = 0
+
+        # Start time for first iteration
+        start_iteration_time = datetime.datetime.now()
         for i in range(len(cuts)):
-            # Start time 
-            start_time = datetime.datetime.now()
             mkp.linear_constraints.add(
                 lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols-nRows)], val= cuts[i])], 
                 senses= [cut_senses[i]], 
@@ -135,7 +140,7 @@ def solveProblem(instance : str, cluster_type : str) :
             mkp.set_problem_name(name+"_cut_n"+str(i+1))
             logging.info("\n\t\t\t\t\t Resolution of the problem called '"+name+"': "+str(i+1)+" Gomory cuts applied.")
             mkp.solve()
-            elapsed_time = (datetime.datetime.now()-start_time).total_seconds() * 1000
+            elapsed_time = (datetime.datetime.now()-start_iteration_time).total_seconds() * 1000
             sol,sol_type,status=print_solution(mkp)
             if status=='infeasible':
                 break_before= 1
@@ -148,27 +153,34 @@ def solveProblem(instance : str, cluster_type : str) :
             mkp.write(path_base_lp+"/iteration1/"+str(i+1)+"_cut.lp")
             mkp.solution.write(path_base_log+"/iteration1/"+str(i+1)+"_cut.log")
             
-        elapsed_time = (datetime.datetime.now()-start_time).total_seconds() * 1000
-        logging.info("Elapsed time: %s Milliseconds", elapsed_time)
+        iteration_time = (datetime.datetime.now()-start_iteration_time).total_seconds() * 1000
+        total_time += iteration_time
+        logging.info("Iteration time: %s Milliseconds", iteration_time)
         mkp.end()
         pass
+
     if break_before== 1 : 
             return tot_stats
 
-    start_time = datetime.datetime.now()
-    elapsed_time = 0
     iteration = 1
     rel_gap=9999999999999999.0
     sol_type="optimal"
-    while (elapsed_time <= MAX_TIME and rel_gap<THRESHOLD_GAP and sol_type=="optimal") :
+    while (total_time <= MAX_TIME and rel_gap>THRESHOLD_GAP and sol_type=="optimal") :
+        start_iteration_time = datetime.datetime.now()
         iteration += 1
-        sol,sol_type,status,cuts,cut_limits, tot_stats= iterateGomory(name,cluster_type,instance,cuts,cut_limits,tot_stats,optimal_sol,iteration,lower,upper)
+        sol,sol_type,status,cuts,cut_limits, tot_stats= iterateGomory(name,cluster_type,instance,cuts,cut_limits,tot_stats,optimal_sol,iteration)
         rel_gap = modulus(sol,optimal_sol)/(optimal_sol+pow(10,-10))
-        elapsed_time_t = (datetime.datetime.now()-start_time).total_seconds() * 1000
+        # Get new time
+        iteration_time = (datetime.datetime.now()-start_iteration_time).total_seconds() * 1000
+        total_time = total_time + iteration_time
+        logging.info("Iteration time: %s Milliseconds", iteration_time)
+        print("Total time passing ... ", total_time, " Milliseconds\n")
 
+
+    logging.info("Total time: %s Milliseconds", total_time)
     return tot_stats
 
-def iterateGomory(name,cluster_type,instance,cuts,cut_limits,tot_stats, optimal_sol, iteration,lower,upper):
+def iterateGomory(name,cluster_type,instance,cuts,cut_limits,tot_stats, optimal_sol, iteration):
     
     c, A, b = getProblemData(instance)
     newA = A.tolist()
@@ -235,21 +247,20 @@ def iterateGomory(name,cluster_type,instance,cuts,cut_limits,tot_stats, optimal_
         # Add objective function -----------------------------------------------------------
         for i in range(nCols-nRows): 
             mkp.objective.set_linear([(i, c[i])])
-        # solve mkp
+        # solve mkp with 0 cuts
         mkp.solve()
-        # get solution
+        # get solution with 0 cuts
         sol, sol_type,status = print_solution(mkp)
         mkp.write(path_base_lp+"/iteration"+str(iteration)+"/0_cut.lp")
         mkp.solution.write(path_base_log+"/iteration"+str(iteration)+"/0_cut.log")
         ########################################################################
-        start_time =datetime.datetime.now()
         n_cuts, b_bar = get_tableau(mkp)
         gc_lhs, gc_rhs = initialize_fract_gc(n_cuts, nCols, mkp, names,b_bar)
         new_cuts, new_cut_limits, new_cut_senses=generate_gc(mkp, A, gc_lhs, gc_rhs, names)
-        
+        # start ime
+        start_iteration_time = datetime.datetime.now()
         # Add the cuts sequentially and solve the problem (without slack variables)
         for i in range(len(new_cuts)):
-            # Start time 
             mkp.linear_constraints.add(
                 lin_expr= [cplex.SparsePair(ind= [j for j in range(nCols-nRows)], val= new_cuts[i])], 
                 senses= [new_cut_senses[i]], 
@@ -259,7 +270,7 @@ def iterateGomory(name,cluster_type,instance,cuts,cut_limits,tot_stats, optimal_
             logging.info("\n\t\t\t\t\t Resolution of the problem called '"+name+"': "+str(i+1)+" Gomory cuts applied.")
             mkp.solve()
             sol,sol_type,status=print_solution(mkp)
-            elapsed_time = (datetime.datetime.now()-start_time).total_seconds() * 1000
+            elapsed_time = (datetime.datetime.now()-start_iteration_time).total_seconds() * 1000
             tot_stats.append(getStatistics(name,cluster_type,nCols-nRows,(nRows+len(cuts)),optimal_sol,sol,sol_type,status,n_cuts+i+1,elapsed_time,iteration))
             mkp.write(path_base_lp+"/iteration"+str(iteration)+"/"+str(i+1)+"_cut.lp")
             mkp.solution.write(path_base_log+"/iteration"+str(iteration)+"/"+str(i+1)+"_cut.log")

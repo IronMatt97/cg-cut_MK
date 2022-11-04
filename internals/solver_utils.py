@@ -201,6 +201,7 @@ def initialize_fract_gc(n_cuts,ncol , prob, varnames, b_bar) :
         gc_lhs
         gc_rhs 
     '''
+    
     cuts = np.zeros([n_cuts,ncol])
     cut_limits= []
     gc_sense = [''] * n_cuts

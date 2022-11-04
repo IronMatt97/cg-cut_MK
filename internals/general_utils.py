@@ -5,6 +5,7 @@ import random
 import sys
 import os
 import math
+import shutil
 
 logging.basicConfig(filename='resolution.log', format='%(asctime)s - %(message)s',level=logging.INFO, datefmt='%d-%b-%y %H:%M:%S')
 
@@ -109,6 +110,15 @@ def flushLog(logName):
     '''
     with open(logName,'w') as file:
         pass 
+
+    if os.path.exists("lp"):
+        shutil.rmtree("lp")
+    
+    if os.path.exists("solutions"):
+        shutil.rmtree("solutions")
+            
+ 
+    
 
 
 def invalidInput():
