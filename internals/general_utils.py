@@ -41,10 +41,12 @@ def modulus(x, y):
     return result
 
 def generateIstances(cluster_type)  :
-    columns = ["ratio_profits_weights","name"]
+    columns = ["corr","name"]
     # Read config file
     config = ConfigParser()
     config.read('config.ini')
+    if not os.path.exists("correlations"):
+        os.makedirs("correlations")
     # Get a list of all Clusters 
     for cluster in config.sections():
         if cluster_type == cluster : 
@@ -54,7 +56,7 @@ def generateIstances(cluster_type)  :
             df_list = generateClusterOfIstances(num_instances, var_range, constr_range, cluster)
             df = pd.DataFrame(df_list)
             df.columns = columns
-            df.to_csv(cluster+'_ratio.csv',index=False)
+            df.to_csv("correlations/"+cluster+'_corr.csv',index=False)
 
 
 def generateClusterOfIstances(num_instances, var_range, constr_range, cluster_type) : 
@@ -103,7 +105,6 @@ def generateInstance(instance_num : int, nvar : int , nconstraints : int, cluste
     instance.write(str(nvar)+" "+str(nconstraints)+"\n")
     profits=[]
     weights=[]
-    correlations = []
     
     # Let's write the constraints 
     for constraint in range(0,nconstraints+1): # The +1 is for the objective function
