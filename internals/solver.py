@@ -165,7 +165,7 @@ def solveProblem(instance : str, cluster_type : str) :
     iteration = 1
     rel_gap=9999999999999999.0
     sol_type="optimal"
-    while (total_time <= MAX_TIME and rel_gap>THRESHOLD_GAP and sol_type=="optimal") :
+    while (total_time <= MAX_TIME and rel_gap>THRESHOLD_GAP and status=="optimal") :
         start_iteration_time = datetime.datetime.now()
         iteration += 1
         sol,sol_type,status,cuts,cut_limits, tot_stats= iterateGomory(name,cluster_type,instance,cuts,cut_limits,tot_stats,optimal_sol,iteration)
@@ -174,7 +174,6 @@ def solveProblem(instance : str, cluster_type : str) :
         iteration_time = (datetime.datetime.now()-start_iteration_time).total_seconds() * 1000
         total_time = total_time + iteration_time
         logging.info("Iteration time: %s Milliseconds", iteration_time)
-        print("Total time passing ... ", total_time, " Milliseconds\n")
 
 
     logging.info("Total time: %s Milliseconds", total_time)
