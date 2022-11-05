@@ -22,26 +22,31 @@ def get_raw_ratio_data(filename) :
     return df
 
 def gap_variations(df):
-    df  = df[["name","relative_gap","ncuts","cluster_type"]]
+    df  = df[["name","relative_gap","ncuts","cluster_type","status","gap"]]
     cluster_types = df["cluster_type"].unique()
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16, 8))
-    fig.suptitle("Relative gap variations")
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 15))
+    fig.suptitle("Gap variations over cuts")
     for cluster_name, ax in zip(cluster_types,axes.flatten()):
-        cluster = df[df['cluster_type'] == cluster_name]
+        cluster_1 = df[(df['cluster_type'] == cluster_name)]
+        cluster = cluster_1[cluster_1['status']!="infeasible"]
         for name in cluster["name"].unique():
             instance = cluster[cluster['name'] == name]
-            ax.plot(instance["ncuts"].values,instance["relative_gap"].values, label = name)
+            ax.plot(instance["ncuts"].values,instance["gap"].values, label = name)
             ax.set_title(cluster_name)
+            ax.set_xlabel("Applied cus")
+            ax.set_ylabel("Gap")
+            #ax.set_xlim([0,100])
     plt.legend(title="Instances",loc=3,bbox_to_anchor=(1,0))
     plt.savefig("plots/gap_variations.png")
 
 def gap_histograms(df):
-    df  = df[["name","relative_gap","ncuts","cluster_type"]]
+    df  = df[["name","relative_gap","ncuts","cluster_type","status","gap"]]
     cluster_types = df["cluster_type"].unique()
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16, 8))
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 15))
     fig.suptitle("Relative gap distributions")
     for cluster_name, ax in zip(cluster_types,axes.flatten()):
-        cluster = df[df['cluster_type'] == cluster_name]
+        cluster_1 = df[(df['cluster_type'] == cluster_name)]
+        cluster = cluster_1[cluster_1['status']!="infeasible"]
         N,bins,patches = ax.hist(cluster["relative_gap"].values, label = cluster_name, bins=50, edgecolor = 'black')
         fracs = N / N.max()
         norm = colors.Normalize(fracs.min(), fracs.max())
@@ -49,28 +54,33 @@ def gap_histograms(df):
             color = plt.cm.viridis(norm(thisfrac))
             thispatch.set_facecolor(color)
         ax.set_title(cluster_name)
+        ax.set_xlabel("Relative gap")
     plt.savefig("plots/gap_histogram.png")
 
 def gap_variations_over_time(df):
-    df  = df[["name","relative_gap","ncuts","cluster_type","elapsed_time"]]
+    df  = df[["name","relative_gap","ncuts","cluster_type","elapsed_time","status","gap"]]
     cluster_types = df["cluster_type"].unique()
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16, 8))
-    fig.suptitle("Relative gap variations over time")
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 15))
+    fig.suptitle("Gap variations over time")
     for cluster_name, ax in zip(cluster_types,axes.flatten()):
-        cluster = df[df['cluster_type'] == cluster_name]
+        cluster_1 = df[(df['cluster_type'] == cluster_name)]
+        cluster = cluster_1[cluster_1['status']!="infeasible"]
         for name in cluster["name"].unique():
             instance = cluster[cluster['name'] == name]
-            ax.plot(instance["elapsed_time"].values,instance["relative_gap"].values, label = name)
+            ax.plot((instance["elapsed_time"].sort_values()).values,instance["gap"].values, label = name)
             ax.set_title(cluster_name)
+            ax.set_xlabel("Time (ms)")
+            ax.set_ylabel("Gap")
+            #ax.set_xlim([0,3000])
     plt.legend(title="Instances",loc=3,bbox_to_anchor=(1,0))
     plt.savefig("plots/gap_variations_over_time.png")
 
 
 def correlation_gap_ratio(df):
-    df  = df[["name","relative_gap","ncuts","cluster_type","elapsed_time"]]
+    df  = df[["name","relative_gap","ncuts","cluster_type","elapsed_time","status","gap"]]
     cluster_types = df["cluster_type"].unique()
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(16, 8))
-    fig.suptitle("Weight/Profit correlation with relative gap")
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 15))
+    fig.suptitle("Gomory effectiveness among profit/weight correlations")
     for cluster_name, ax in zip(cluster_types,axes.flatten()):
         x = []
         y = []
@@ -82,14 +92,11 @@ def correlation_gap_ratio(df):
             ratio_instance = ratio_df[ratio_df['name']==name]['corr']
             x.append(ratio_instance.values[0])
             y.append(gap_instance.squeeze().values[1])
-        ax.scatter(x,y,label = name,alpha=0.5)
-        ax.set_xlabel("corr")
-        ax.set_ylabel("relative_gap")
+        ax.scatter(x,y,label = name,alpha=0.5, color ="red")
+        ax.set_xlabel("Profit/Weight Correlation")
+        ax.set_ylabel("Relative gap")
         ax.set_title(cluster_name)
-        z = np.polyfit(x, y, 1) 
-        p = np.poly1d(z) 
-        ax.plot(x,p(x),"r--")
-    plt.legend(title="Instances",loc=3,bbox_to_anchor=(1,0))
+        ax.set_xlim([-1,1])
     plt.savefig("plots/correlation_gap_ratio.png")
 
 
