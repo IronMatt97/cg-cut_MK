@@ -12,7 +12,7 @@ In this expression $x_{B_i}$ are the basic variables, $x_{N_j}$ are the non-basi
 
 A Gomory cutting plane (Gilmore and Gomory 1961) is expressed by : 
 
-$$\sum_j{(t_{ij}- \lfloor{t_{ij}}\rfloor) x_{N_j}} \geq {b^*_i - \lfloor{b^*_i}\rfloor}$$
+$$ \sum_j ( t_{ij} - \lfloor{t_{ij}}\rfloor) x_{N_j}  \geq {b^*_i} - \lfloor {b_i}  \rfloor $$
 
 This is guaranteed to be a valid cut of the LP relaxation of an integer programming problem.
 
