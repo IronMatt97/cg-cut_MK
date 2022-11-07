@@ -165,17 +165,14 @@ def solveProblem(instance : str, cluster_type : str) :
     iteration = 1
     rel_gap=9999999999999999.0
     sol_type="optimal"
-    still_worth = True
     c=0
-    while (total_time <= MAX_TIME and rel_gap>THRESHOLD_GAP and status=="optimal" and still_worth) :
+    while (total_time <= MAX_TIME and rel_gap>THRESHOLD_GAP and status=="optimal") :
         start_iteration_time = datetime.datetime.now()
         iteration += 1
         old_sol = sol
         sol,sol_type,status,cuts,cut_limits, tot_stats= iterateGomory(name,cluster_type,instance,cuts,cut_limits,tot_stats,optimal_sol,iteration)
         if sol == old_sol:
             c+=1;
-        if c == 100:
-            still_worth = False
         if(optimal_sol==0):
             rel_gap = 1
         else:
