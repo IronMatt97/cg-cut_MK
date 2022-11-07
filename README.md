@@ -52,7 +52,7 @@ In order to solve pseudo-randomically generated instances, we provide a config.i
 - All the resolution is readable in resolution.log
 ## References
 
-Caprara, A., Fischetti, M. $\\{0,\frac{1}{2}\\}$-Chvátal-Gomory cuts. Mathematical Programming 74, 221–235 (1996). https://doi.org/10.1007/BF02592196\n",
+Caprara, A., Fischetti, M. $\\{0,\frac{1}{2}\\}$-Chvátal-Gomory cuts. Mathematical Programming 74, 221–235 (1996). https://doi.org/10.1007/BF02592196
 
 Authors
 ======================= 
