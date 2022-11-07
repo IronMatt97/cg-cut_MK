@@ -5,13 +5,14 @@ http://people.brunel.ac.uk/~mastjjb/jeb/orlib/mknapinfo.html
 
 ## Gomory Cuts algorithm
 The $i$-th row of the optimal tableau of the problem in standard form is expressed by :
- $$x_{B_i} + \sum_j t_{ij}x_{N_j} = b^*_i$$
+
+$$x_{B_i} + \sum_j t_{ij}x_{N_j} = b^*_i$$
 
 In this expression $x_{B_i}$ are the basic variables, $x_{N_j}$ are the non-basic variables and $t_{ij}$ is the multiplicative coefficient for non-basic variable $j$ in the $i$-th row.
 
 A Gomory cutting plane (Gilmore and Gomory 1961) is expressed by : 
 
-$$\sum_j (t_{ij} - \lfloor t_{ij} \rfloor) x_{N_j} \geq b^*_i - \lfloor b^*_i \rfloor$$
+$$\sum_j(t_{ij}-\lfloor t_{ij}\rfloor)x_{N_j}\geq (b^*_i - \lfloor b^*_i\rfloor)$$
 
 This is guaranteed to be a valid cut of the LP relaxation of an integer programming problem.
 
