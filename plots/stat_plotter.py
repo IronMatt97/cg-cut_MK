@@ -33,7 +33,7 @@ def gap_variations(df):
             instance = cluster[cluster['name'] == name]
             ax.plot(instance["ncuts"].values,instance["gap"].values, label = name)
             ax.set_title(cluster_name)
-            ax.set_xlabel("Applied cus")
+            ax.set_xlabel("Applied cuts")
             ax.set_ylabel("Gap")
             #ax.set_xlim([0,100])
     plt.legend(title="Instances",loc=3,bbox_to_anchor=(1,0))
