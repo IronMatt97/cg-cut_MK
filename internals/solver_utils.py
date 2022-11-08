@@ -188,7 +188,6 @@ def determineOptimal(instance, cluster_type):
 
 def initialize_fract_gc(n_cuts,ncol , prob, varnames, b_bar) : 
     '''
-    ##Description
     
     Arguments:
         n_cuts
@@ -253,7 +252,6 @@ def initialize_fract_gc(n_cuts,ncol , prob, varnames, b_bar) :
 
 def generate_gc(mkp, A, gc_lhs, gc_rhs, names) : 
     '''
-    ##Description
     
     Arguments:
         mkp
@@ -293,18 +291,7 @@ def generate_gc(mkp, A, gc_lhs, gc_rhs, names) :
     return cuts, cuts_limits, cut_senses
 
 def get_lhs_rhs(prob, cut_row, cut_rhs, A):
-    '''
-    ##Description
-    
-    Arguments:
-        prob
-        cut_row
-        cut_rhs
-        A
-    returns:
-        lhs
-        rhs
-    '''
+
     ncol = len(A[0])
     cut_row = np.append(cut_row, cut_rhs)
     b = np.array(prob.linear_constraints.get_rhs())

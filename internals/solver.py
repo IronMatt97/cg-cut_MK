@@ -187,6 +187,9 @@ def solveProblem(instance : str, cluster_type : str) :
     return tot_stats
 
 def iterateGomory(name,cluster_type,instance,cuts,cut_limits,tot_stats, optimal_sol, iteration):
+    '''
+    This function solves a  gomory iteration's algorithm
+    '''
     
     c, A, b = getProblemData(instance)
     newA = A.tolist()
