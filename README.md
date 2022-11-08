@@ -31,6 +31,7 @@ http://people.brunel.ac.uk/~mastjjb/jeb/orlib/files/
 ### Generation of test
 Inspired by the form of previous tests, we created a function that generates mknap problems randomly in .txt format. 
 
+
 ## Pre-requisites & Installing
 - Make sure you have IBM ILOG installed in your machine and the python interface for CPLEX.
 What is CPLEX: https://www.ibm.com/products/ilog-cplex-optimization-studio
@@ -50,6 +51,11 @@ In order to solve pseudo-randomically generated instances, we provide a config.i
 
 - It will generate files in solutions/[test_name] and lp/[test_name]
 - All the resolution is readable in resolution.log
+
+## Plots 
+In order to plot the statistics : 
+- Run  :
+``` python /plots/stat_plotter.py ```
 ## References
 
 Caprara, A., Fischetti, M. $\\{0,\frac{1}{2}\\}$-Chvátal-Gomory cuts. Mathematical Programming 74, 221–235 (1996). https://doi.org/10.1007/BF02592196
